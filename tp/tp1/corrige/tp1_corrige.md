@@ -21,11 +21,26 @@
 
 ### Création de la VM
 
-- Une fois installé, créer une VM avec Ubuntu 20.04 dessus avec les caractéristiques suivantes :
+- Une fois installé, créer une VM avec Ubuntu 20.04 
+- L'interface de VirtualBox liste les VM :
+![install_vb7](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/install_vb7.PNG)
+- En cliquant sur +Ajouter, vous obtenez l'écran d'ajout des VM dans lequel vous pouvez choisir le nom de votre VM, l'endroit dans lequel elle va être stocké, votre système d'exploitation, ici Linux avec Ubuntu 64bit
+![nouvelle_vm](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/nouvelle_vm.PNG)
+- L'étape suivante permet d'allouer de la RAM à la machine, ici j'ai volontairaiment augmentée la RAM à 4Go
+![vb_ram](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/vb_ram.PNG)
+- L'étape suivante permet de choisir si l'on alloue un disque dur (pour persister des données): ici j'ai choisi d'ajouter un disque virtuel de 10Go
+![vb_dd](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/vb_dd.PNG)
+- Ensuite nous choisissons le type de stockage (s'il est dynamiquement alloué en fonction des besoins (permet d'éviter d'encombrer inutilement le disque dur de l'hôte) ou s'il est fixe (permet de réserver de l'espace disque sur le disque dur de l'hôte))
+![vb_stockage_dd](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/vb_stockage_dd.PNG)
+- Ensuite nous choisissons l'emplacement physique de notre disque virtuel et sa taille
+![vb_emplacement_dd](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/vb_emplacement_dd.PNG)
+- Puis nous pouvons créé notre VM :
+![vb_vm_creee](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/vb_vm_creee.PNG)
+
+### Installation de l'OS
 
 
-
-## Step 2 : Installer docker 
+##  Installer docker 
 - Démarrer la VM
 - Installer docker : https://www.docker.com/get-started
 - Une fois l'installation terminée, ouvrez un terminal et taper :
