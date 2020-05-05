@@ -3,9 +3,24 @@
 ## Step 1 : installation de la VM 
 ### Installation de VirtualBox
 - Télécharger VirtualBox : https://www.virtualbox.org/wiki/Downloads
-![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
+- Suivez les étapes d'installation :
+- La première étape vous informe, cliquer sur Installer
+![install_vb1](https://octodex.github.com/images/yaktocat.png)
+- La seconde étape vous invite à choisir les outils à installer : laisser les options par défaut
+![install_vb2](https://octodex.github.com/images/yaktocat.png)
+- La troisième étape vous permet de créer des raccourcis pour accéder à VirtualBox
+![install_vb3](https://octodex.github.com/images/yaktocat.png)
+- La quatrième étape vous avertit que l'installation va temporairement déconnecter votre réseau
+![install_vb4](https://octodex.github.com/images/yaktocat.png)
+- La cinquième étape vous informe que l'installation est prête : cliquer sur Installer
+![install_vb5](https://octodex.github.com/images/yaktocat.png)
+- L'étape suivante installe le logiciel (attendre la fin)
+![install_vb6](https://octodex.github.com/images/yaktocat.png)
+- L'outil est installé, il propose de démarrer
+![install_vb7](https://octodex.github.com/images/yaktocat.png)
 
 ### Création de la VM
+
 - Une fois installé, créer une VM avec Ubuntu 20.04 dessus avec les caractéristiques suivantes :
 
 
