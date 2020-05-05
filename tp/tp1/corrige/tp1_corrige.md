@@ -5,19 +5,19 @@
 - Télécharger VirtualBox : https://www.virtualbox.org/wiki/Downloads
 - Suivez les étapes d'installation :
 - La première étape vous informe, cliquer sur Installer
-![install_vb1](https://octodex.github.com/images/yaktocat.png)
+![install_vb1](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/install_vb1.PNG)
 - La seconde étape vous invite à choisir les outils à installer : laisser les options par défaut
-![install_vb2](https://octodex.github.com/images/yaktocat.png)
+![install_vb2](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/install_vb2.PNG)
 - La troisième étape vous permet de créer des raccourcis pour accéder à VirtualBox
-![install_vb3](https://octodex.github.com/images/yaktocat.png)
+![install_vb3](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/install_vb3.PNG)
 - La quatrième étape vous avertit que l'installation va temporairement déconnecter votre réseau
-![install_vb4](https://octodex.github.com/images/yaktocat.png)
+![install_vb4](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/install_vb4.PNG)
 - La cinquième étape vous informe que l'installation est prête : cliquer sur Installer
-![install_vb5](https://octodex.github.com/images/yaktocat.png)
+![install_vb5](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/install_vb5.PNG)
 - L'étape suivante installe le logiciel (attendre la fin)
-![install_vb6](https://octodex.github.com/images/yaktocat.png)
+![install_vb6](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/install_vb6.PNG)
 - L'outil est installé, il propose de démarrer
-![install_vb7](https://octodex.github.com/images/yaktocat.png)
+![install_vb7](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/install_vb7.PNG)
 
 ### Création de la VM
 
