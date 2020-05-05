@@ -38,7 +38,13 @@
 ![vb_vm_creee](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/vb_vm_creee.PNG)
 
 ### Installation de l'OS
-
+- Télécharger l'ISO d'Ubuntu : https://ubuntu.com/download
+- Dans l'inteface de gestion des VM, choisir votre VM et cliquer sur Configuration. Dans le panneau de configuration, cliquer sur Stockage
+- En cliquant sur le lecteur CD, vous avez de la configuration qui apparait, cliquer à droit sur l'icone de CD puis choissir Depuis un fichier, et aller cherchez votre fichier ISO :
+![vb_choix_iso](https://github.com/vanessakovalsky/docker-training/blob/master/tp/tp1/corrige/images/vb_choix_iso.PNG)
+- Cliquer sur Ok
+- Lancer votre VM
+- Suivre les étapes d'installation d'Ubuntu
 
 ##  Installer docker 
 - Démarrer la VM
