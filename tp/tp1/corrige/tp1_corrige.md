@@ -44,9 +44,11 @@
 - Démarrer la VM
 - Installer docker : https://www.docker.com/get-started
 - Une fois l'installation terminée, ouvrez un terminal et taper :
+```
 docker run hello-world
+```
 - Le retour devrait être :
-'''
+```
 Unable to find image 'hello-world:latest' locally
 latest: Pulling from library/hello-world
 0e03bdcc26d7: Pull complete
@@ -73,5 +75,5 @@ Share images, automate workflows, and more with a free Docker ID:
 
 For more examples and ideas, visit:
  https://docs.docker.com/get-started/
- '''
+ ```
  - Félicitations, votre docker fonctionne ! 
