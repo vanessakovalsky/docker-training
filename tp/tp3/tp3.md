@@ -58,7 +58,15 @@ docker exec -it mydb \
 ```
 - Puis une fois dans le terminal on créé notre base
 ```
- mysql --user=root --password=$MYSQL_ROOT_PASSWORD CREATE DATABASE mydb
+ mysql --user=root --password=$MYSQL_ROOT_PASSWORD 
+```
+ - Une fois dans le terminal de mysql : 
+```
+ CREATE DATABASE mydb;
+ exit 
+```
+- On sort de notre conteneur :
+```
  exit 
 ```
 
