@@ -36,7 +36,7 @@ CMD ["python3", "/usr/src/app/app.py"]
 - Notre dockerfile est prêt pour la suite
 
 ## Construction de notre image
-- Dans le dossier avec le dockerfile, lancer la commande de build pour construire l'image :
+- Dans le dossier avec le dockerfile, lancer la commande de build pour construire l'image, l'option -t permet de nommer l'image construite :
 ```
 docker build -t myfirstapp .
 ```

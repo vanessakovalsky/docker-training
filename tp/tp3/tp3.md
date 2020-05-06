@@ -28,7 +28,7 @@ exit
 ```
 - Passons maintenant au conteneur mysql
 ```
- docker container run \
+ docker container run -i \
  --detach \
  --name mydb \
  -e MYSQL_ROOT_PASSWORD=my-secret-pw \
@@ -87,7 +87,7 @@ docker run -ti -v myvolume:/chemin/vers/mysqldata newimagename /bin/bash
 - Installer apache sur notre conteneur Ubuntu :
 ```
 docker container exec -t -i <containerID> '/bin/bash'
-root@<containerID>:$ apt install httpd
+root@<containerID>:$ apt update && apt install apache2
 ```
 - Enregistre l'image de notre conteneur mysql et la commiter  
 ```
@@ -95,14 +95,14 @@ docker commit <containerID> newimagename2
 ```
 - Exposer le port 80
 ```
-docker container run --detach -p 80:80 newimagename2
+docker container run -i --detach -p 80:80 newimagename2
 ```
 
 ## Créer un montage avec le dossier partagé :
 - On va maintenant monter le dossier dans lequel on a récupérer le depot github sur notre conteneur (se placer d'abord dans le dossier ou est le code du depot) :
 ```
 docker run -d -it --name devtest --mount type=bind,source="$(pwd)"
-target,target=/chemin-vers-le-dossier-de-stockage  newimagename2
+ target=/chemin-vers-le-dossier-de-stockage  newimagename2
 ```
 - Sur le labs : penser à ouvrir le port 80 dans l'interface
 - Se rendre à l'url de votre labs : vous devriez voir votre page s'afficher
