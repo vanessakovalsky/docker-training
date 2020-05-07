@@ -6,16 +6,18 @@ services:
         container_name: my-web-container
         ports:
             - 5000:5000
+            - 443:443
         environment:
+            REGISTRY_HTTP_ADDR: 0.0.0.0:443
             REGISTRY_HTTP_TLS_CERTIFICATE: /certs/localhost.crt
             REGISTRY_HTTP_TLS_KEY: /certs/localhost.key
             REGISTRY_AUTH: htpasswd
             REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
             REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
         volumes:
-            - ./data/: /var/lib/registry
-            - ./certs/: /certs
-            - ./auth/: /auth
+            - data/:/var/lib/registry
+            - ./certs/:/certs
+            - ./auth/:/auth
    ui:
         image: joxit/docker-registry-ui:static
         environment:
@@ -30,8 +32,7 @@ services:
         depends_on:
           - registry
 
-volume:
-  - certs : {}
-  - nginx : {}
-  - auth : {}
-  - data : {}
+volumes:
+  certs 
+  auth 
+  data 
