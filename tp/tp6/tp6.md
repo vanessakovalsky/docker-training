@@ -85,3 +85,5 @@ http:
     Access-Control-Allow-Credentials: [true]
     Access-Control-Allow-Methods: ['HEAD', 'GET', 'OPTIONS'] # Optional
 ```
+
+-> Vous voilà en pleine possession d'un registre privé avec son interface graphique.
