@@ -1,7 +1,12 @@
 # TP8 : Orchestrer ses conteneurs avec docher machine et swarm
 
 Ce dernier TP va permettre de mettre en place un cluster avec Swarm et ses dockers machines mais aussi du load balancing avec Traefik.
-POur cela l'application Consul (https://github.com/WeScale/consul-spring-docker) écrite en Java avec Spring permettant d'exposer une API Rest sera utilisée comme application à déployer.
+Pour cela l'application Consul (https://github.com/WeScale/consul-spring-docker) écrite en Java avec Spring permettant d'exposer une API Rest sera utilisée comme application à déployer.
+
+## Pré-requis : installation docker machine
+
+- Pour installer docker machine, suivre les instructions de cette page :
+https://docs.docker.com/machine/install-machine/
 
 ## Orchestrateur de conteneurs
 - Commencer avec la création de 3 machines : un manager et deux workers :
