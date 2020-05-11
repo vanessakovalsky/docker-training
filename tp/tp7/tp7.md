@@ -6,19 +6,8 @@ Nous allons utiliser la stack ELK pour le premier besoin, et une suite composée
 ## Centralisation des logs
 
 ### MIse en place d'une application ELK
-- POur cela créer un docker compose contenant :
-```
-version: '3.7'
-
-services:
-  elk:
-    image: sebp/elk
-    ports:
-      - "5601:5601"
-      - "9200:9200"
-      - "5044:5044"
-```
-- Avant de le lancer l'image étant un peu lourde : docker pull sebp/elk 
+- On récupère le code ici : https://github.com/deviantony/docker-elk.git (git clone https://github.com/deviantony/docker-elk.git)
+- On utilise le docker-compose.yml fournit à la racine
 - Il ne reste plus qu'à le lancer avec un docker-compose up
 - Une fois le démarrage terminé, vérifier en vous rendant sur :
 http://ip_machine:9200/status qui affiche elastic search
