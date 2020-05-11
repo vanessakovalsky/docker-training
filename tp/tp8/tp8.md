@@ -175,12 +175,5 @@ docker-machine rm worker3 --force
 ```
 - Vérifier sur le visualiseur ce qu'il s'est passé ?
 
-## Pour aller plus loin 
-- A partir des différentes commandes sur les noeuds et traefik, créer un fichier docker-compose.yml pour lancer l'ensemble des services
-- Utiliser deploy stack de swarm avec ce fichier :
-```
-docker deploy --compose-file docker-compose.yml
-```
-
 --> Bien joué, vous avez terminé l'ensemble des TP de la formation DOcker, voyons maintenant sur un exemple de projet sans guide si vous arrivez à mettre en pratique tout ce qu'on a vu :) 
 

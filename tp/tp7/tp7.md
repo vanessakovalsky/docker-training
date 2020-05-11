@@ -8,69 +8,63 @@ Nous allons utiliser la stack ELK pour le premier besoin, et une suite composée
 ### MIse en place d'une application ELK
 - POur cela créer un docker compose contenant :
 ```
-elasticsearch:
-    image: elasticsearch:2.1.1
-    volumes:
-            - /srv/elasticsearch/data:/usr/share/elasticsearch/data
-    ports:
-            - "9200:9200"
+version: '3.7'
 
-logstash:
-    image: logstash:2.1.1
-    environment:
-            TZ: Europe/Paris
-    expose:
-            - "12201"
+services:
+  elk:
+    image: sebp/elk
     ports:
-            - "12201:12201"
-            - "12201:12201/udp"
-    volumes:
-            - ./conf:/conf
-    links:
-            - elasticsearch:elasticsearch
-    command: logstash -f /conf/gelf.conf
-
-kibana:
-    image: kibana:4.3
-    links:
-            - elasticsearch:elasticsearch
-    ports:
-            - "5601:5601"
+      - "5601:5601"
+      - "9200:9200"
+      - "5044:5044"
 ```
-- Un fichier de configuration pour logstash est nécessaire, créer un dossier conf, puis à l'intérieur de ce dossier un fichier nommé gelf.conf avec le contenu suivant
-```
-input {
-  gelf {
-    type => docker
-    port => 12201
-  }
-}
-
-output {
-  elasticsearch {
-    hosts => elasticsearch
-  }
-}
-```
+- Avant de le lancer l'image étant un peu lourde : docker pull sebp/elk 
 - Il ne reste plus qu'à le lancer avec un docker-compose up
 - Une fois le démarrage terminé, vérifier en vous rendant sur :
-http://ip_machine:5601/status qui affiche elastic search
-- Kibana est accessible à l'adresse : http://ip_machine:5601  mais pour l'instant sans donnée il ne permet rien
+http://ip_machine:9200/status qui affiche elastic search
+- Kibana est accessible à l'adresse : http://ip_machine:5601  mais pour l'instant sans donnée il ne s'affiche pas
 - L'environnement est prêt, il faut maintenant l'alimenter en données
 
 ### Envoyer des données à ELK
-- Docker supporte le format GELF (GraylogExtendedLogFormat) qui est utilisé par graylog ou logstash, et qui permet au conteneur d'envoyer directement les logs à un de ces outils
-- Pour cela utiliser l'option de driver de log prévu à cet effet
+- Pour alimenter ELK en données, on utilise Filebeats qui va aller automatiquement lire les logs générées par docker, et les envoyer à logstash
+- Pour cela ajouter au docker compose le service filebeat :
 ```
---log-driver=gelf --log-opt gelf-address=udp://ip_machine:12201
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.6.2
+    command: filebeat -e -strict.perms=false
+    #volumnes mount depend on you OS ( Windows or Linux )
+    volumes:
+      - ./../docker-elk-filebeat/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./../docker-elk-filebeat/filebeat/sample_log:/usr/share/filebeat/logs
+    networks:
+      - elk
+    links:
+       - elasticsearch
+       - kibana
 ```
-- Par exemple :
+- Puis créer un dossier filebeat et un fichier filebeat.yml a l'interieur de ce dossier qui contient :
 ```
-docker run --log-driver=gelf --log-opt gelf-address=udp://192.168.10.2:12201 debian bash -c 'seq 1 10'
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+
+processors:
+- add_cloud_metadata: ~
+
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  username: elastic
+  password: changeme
 ```
-- Pour vérifier que cela fonctionne, retourner sur la page de kibana, et valider le formulaire (cela indique que Kibana a bien reçu des données)
+- Pour vérifier que cela fonctionne, retourner sur la page de kibana, et valider le formulaire de création d'index (cela indique que Kibana a bien reçu des données)
 - Cherchez dans l'interface de kibana ou sont afficher les logs de notre conteneur ?
-- Reprenez le docker-compose du tp 5 et ajouter lui les options pour envoyer les logs à logstash, puis relancez le et aller vérifier que les logs apparaissent bien dans kibana
+- Relancer le docker-compose du tp 5 et et aller vérifier que les logs apparaissent bien dans kibana
 
 
 ## Mise en place du monitoring
@@ -98,6 +92,7 @@ networks:
   monitoring:
     driver: bridge
 ```
+- Penser à rajouter le network monitoring sur les autres conteneurs
 - Démarrer le conteneur (docker-compose up)
 - En allant sur : http://ip_machine:8005 vous pourrez visualiser les métriques de vos conteneurs
 
@@ -105,7 +100,7 @@ networks:
 - Pour aller plus loin et rendre cela configuration, ajouter Promotheus au docker-compose :
 ```
 prometheus:
-      image: prom/prometheus:v2.0.0
+      image: prom/prometheus:latest
       container_name: prometheus
       volumes:
         - ./docker/prometheus/:/etc/prometheus/
@@ -127,7 +122,7 @@ volumes:
 ...
   prometheus-data: {}
 ```
-- Créer un dossier docker/promotheus et à l'intérieur de ce dossier un fichier promotheus.yml (qui sert pour la configuration) avec le contenu suivant :
+- Créer un dossier /prometheus et à l'intérieur de ce dossier un fichier prometheus.yml (qui sert pour la configuration) avec le contenu suivant :
 ```
 global:
   scrape_interval: 15s
@@ -151,7 +146,7 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 ```
-- Relancer un build et un up sur le docker-compose
+- Relancer un down un up sur le docker-compose
 - Promotheus est accessible sur : http://ip_machine:9090/targets
 - On peut alors vérifier le statut de nos conteneurs
 
@@ -160,23 +155,18 @@ scrape_configs:
 - Ajouter alors l'interface pour créer et visualiser des dashboard grafana au docker compose :
 ```
  grafana:
-    image: grafana/grafana:4.6.2
+    image: grafana/grafana:latest
     container_name: grafana
-    volumes:
-      - grafana-data:/var/lib/grafana
     expose:
       - 3000
     ports:
       - "3000:3000"
     networks:
       - monitoring
-
-volumes:
-...
-  grafana-data: {}
 ```
 - Puis reconstruire et relancer le docker compose
 - Grafana est accesssible sur http://ip_machine:3000 (login et password par défaut : admin)
-- Il ne reste plus qu'à configurer la source de données (Promothéus) et à créer les dashboard (par exemple vous pouvez importer le dashboard https://grafana.com/grafana/dashboards/193 prévu pour docker)
+- Il ne reste plus qu'à configurer la source de données (Promothéus) et à créer les dashboard (par exemple vous pouvez importer le dashboard https://grafana.com/grafana/dashboards/193 prévu pour docker) 
+Pour l'URL mettre l'IP du container avec promotheus avec le port 9090 (pour la trouver docker network inspect monitoring)
 
 -> Félicitations votre applications est maintenant monitorer et ses logs centralisés, elle est presque prête pour la production :) 
