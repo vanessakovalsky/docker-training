@@ -46,7 +46,7 @@ ls
 
 - Maintenant essayons une fois sorti du terminal du conteneur (exit), d'afficher les fichiers du conteneur :
 ```
-docker conteneur run alpine ls
+docker container run alpine ls
 ```
 - Que constatez vous ?
 - -> Il s'agit de l'isolation de docker entre la machine hote et les conteneurs, les fichiers ne sont pas accessible de l'exterieur
