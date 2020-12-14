@@ -1,4 +1,4 @@
-#TP 1 - Création de l'environnement de travail (VM) et installation de Docker
+# TP 1 - Création de l'environnement de travail (VM) et installation de Docker
 
 ## Step 1 : installation de la VM 
 * Télécharger VirtualBox : https://www.virtualbox.org/wiki/Downloads
@@ -9,7 +9,7 @@
 * * partage du réseau avec la machine hôté
 
 
-# Step 2 : Installer docker 
+## Step 2 : Installer docker 
 * Démarrer la VM
 * Installer docker : https://www.docker.com/get-started
 * Une fois l'installation terminée, ouvrez un terminal et taper :
