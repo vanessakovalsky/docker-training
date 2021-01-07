@@ -40,7 +40,8 @@ docker system prune
 version: '3.1'
 
 services:
-  mysql_container:
+ # Ne pas utiliser d'underscore dans le nom du service, cela génère des erreurs lors de l'utilisation du nom en tant qu'hôte
+  mysql-container:
     image: mysql
     ports:
       - 3306:3306
