@@ -84,6 +84,13 @@ docker commit <containerID> newimagename
 docker run -ti -v myvolume:/chemin/vers/mysqldata newimagename /bin/bash
 ```
 ## Exposer le port 80 sur notre conteneur
+
+- Lancer un conteneur Ubuntu qui tourne en arrière plan :
+```
+docker container run -d ubuntu
+```
+- Celui-ci vous renvoit l'ID du conteneur à utiliser dans les commandes suivantes
+
 - Installer apache sur notre conteneur Ubuntu :
 ```
 docker container exec -t -i <containerID> '/bin/bash'
