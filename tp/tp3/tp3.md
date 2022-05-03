@@ -94,7 +94,8 @@ docker container run -d ubuntu
 - Installer apache sur notre conteneur Ubuntu :
 ```
 docker container exec -t -i <containerID> '/bin/bash'
-root@<containerID>:$ apt update && apt install apache2
+root@<containerID>:$ apt -y update && apt install -y apache2 
+root@<containerID>:$ service apache2 start
 ```
 - Enregistre l'image de notre conteneur mysql et la commiter  
 ```
