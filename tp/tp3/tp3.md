@@ -10,7 +10,7 @@ https://hub.docker.com/
 ## Lancement de conteneur ubuntu et mysql
 - Pour commencer on lance un conteneur ubuntu en mode interactif et on lui demande de lancer le processus bash :
 ```
- docker container run --interactive --tty --rm -d ubuntu bash
+ docker container run --interactive --tty --rm ubuntu bash
 ```
 - Vous avez alors accès au terminal du conteneur ubuntu :
 ```
