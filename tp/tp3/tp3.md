@@ -122,11 +122,11 @@ docker run -d -it --name devtest --mount type=bind,source="$(pwd)"
 ## Pusher vos images :
 - Se connecter au docker hub en commande :
 ```
-docker login --username=yourhubusername --email=youremail@company.com
+docker login --username=yourhubusername 
 ```
 - Tagguer votre image :
 ```
-docker tag <containerId> yourhubusername/newimagename2:firsttry
+docker tag <imageId> yourhubusername/newimagename2:firsttry
 ```
 - Pusher votre images sur le dépôt :
 ```
