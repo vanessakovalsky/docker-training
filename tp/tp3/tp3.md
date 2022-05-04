@@ -130,7 +130,7 @@ docker tag <imageId> yourhubusername/newimagename2:firsttry
 ```
 - Pusher votre images sur le dépôt :
 ```
-docker push yourhubusername/newimagename2
+docker push yourhubusername/newimagename2:firsttry
 ```
 
 -> Bien joué vous avez terminé ce TP 
