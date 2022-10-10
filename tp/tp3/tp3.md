@@ -88,6 +88,7 @@ docker run -ti -v myvolume:/chemin/vers/mysqldata newimagename /bin/bash
 - Lancer un conteneur Ubuntu qui tourne en arrière plan :
 ```
 docker container run -t -d ubuntu
+
 ```
 - Celui-ci vous renvoit l'ID du conteneur à utiliser dans les commandes suivantes
 
@@ -109,7 +110,8 @@ docker container run -i --detach -p 80:80 newimagename2
 ## Créer un montage avec le dossier partagé :
 - On va maintenant monter le dossier dans lequel on a récupérer le depot github sur notre conteneur (se placer d'abord dans le dossier ou est le code du depot) :
 ```
-docker run -d -it --name devtest --mount type=bind,source="$(pwd)",target=/var/www/html -p 80:80 newimagename2
+
+docker run -d -it --name devtest --mount type=bind,source="$(pwd)", target=/chemin-vers-le-dossier-de-stockage -p 80:80 newimagename2
 ```
 - Sur le labs : penser à ouvrir le port 80 dans l'interface
 - Se rendre à l'url de votre labs : vous devriez voir votre page s'afficher
