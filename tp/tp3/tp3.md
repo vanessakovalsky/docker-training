@@ -87,7 +87,7 @@ docker run -ti -v myvolume:/chemin/vers/mysqldata newimagename /bin/bash
 
 - Lancer un conteneur Ubuntu qui tourne en arrière plan :
 ```
-docker container run -d ubuntu
+docker container run -dt ubuntu
 ```
 - Celui-ci vous renvoit l'ID du conteneur à utiliser dans les commandes suivantes
 
