@@ -98,7 +98,7 @@ docker container exec -t -i <containerID> '/bin/bash'
 root@<containerID>:$ apt -y update && apt install -y apache2 
 root@<containerID>:$ service apache2 start
 ```
-- Enregistre l'image de notre conteneur mysql et la commiter  
+- Enregistre l'image de notre conteneur ubuntu et la commiter  
 ```
 docker commit <containerID> newimagename2
 ```
