@@ -111,8 +111,17 @@ docker container run -i --detach -p 80:80 newimagename2
 - On va maintenant monter le dossier dans lequel on a récupérer le depot github sur notre conteneur (se placer d'abord dans le dossier ou est le code du depot) :
 ```
 
-docker run -d -it --name devtest --mount type=bind,source="$(pwd)", target=/chemin-vers-le-dossier-de-stockage -p 80:80 newimagename2
+docker run -d -it --name devtest --mount type=bind,source="$(pwd)", target=/var/www/html/myapp -p 8090:80 newimagename2
 ```
+* Se connecter sur le conteneur et démarrer apache :
+
+```
+
+docker exec -it devtest /bin/bash
+root@idducontainer: service apache2 start
+exit
+```
+- en local (à l'endroit où est installé docker) ouvrir un navigateur et aller sur http://localhost:8090/myapp
 - Sur le labs : penser à ouvrir le port 80 dans l'interface
 - Se rendre à l'url de votre labs : vous devriez voir votre page s'afficher
 
