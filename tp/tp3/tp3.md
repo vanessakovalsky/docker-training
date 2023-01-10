@@ -111,7 +111,7 @@ docker container run -i --detach -p 80:80 newimagename2
 - On va maintenant monter le dossier dans lequel on a récupérer le depot github sur notre conteneur (se placer d'abord dans le dossier ou est le code du depot) :
 ```
 
-docker run -d -it --name devtest --mount type=bind,source="$(pwd)", target=/var/www/html/myapp -p 8090:80 newimagename2
+docker run -d -it --name devtest --mount type=bind,source="$(pwd)",target=/var/www/html/myapp -p 8090:80 newimagename2
 ```
 * Se connecter sur le conteneur et démarrer apache :
 
