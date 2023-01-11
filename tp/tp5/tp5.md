@@ -51,13 +51,13 @@ services:
 - Le conteneur de mysql a été ajouté en tant que service
 - POur lancer le fichier on utilise :
 ```
-docker-compose up
+docker compose up
 ```
 - Cela crééra autant de conteneurs qu'il y a de services dans votre fichier
 - A partir de la commande de run du conteneur de wordpress, ajouter au docker compose un service pour le conteneur wordpress
 - Une fois le service ajouter, utiliser de nouveau la commande suivante pour vérifier que vos services fonctionnes 
 ```
-docker-compose up
+docker compose up
 ```
 - Si vous regarder du côté des réseaux, que constatez vous ?
 
