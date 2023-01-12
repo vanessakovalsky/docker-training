@@ -85,22 +85,11 @@ joxit/docker-registry-ui:latest
 - Penser à inclure une dépendance dans votre docker-compose pour que ce service ne se lance que si le registre privé fonctionne
 
 ## Step 6 - Connexion sur l'interface graphique
-- Il est nécessaire de remettre en place une connexion sur notre interface graphique et notre registre (pour éviter que tout le monde puisse pousser ou récupérer des images)
-- Plutot que de surcharger les variables d'environnement on utilise un fichier de configuration pour le registry, il se trouve dans corrige/registry-config et est au format yaml.
-On rajoute dans le compose un montage sur ce volume, pour que celui-ci soit lu lors du lancement de l'image (fait automatiquement par le dockerfile fournit par l'image officielle registry)
-- On remet en place le htpassword pour l'authentification
-- On créer un fichier .env dans le dossier nginx, ce sont les informations de connexions que l'ui utilisera (adapter le login / password en fonction aussi de ce qu'il y a dans ), pour généré sont contenu on utilise la commande :
-```
-echo -n "testuser:testpassword" | base64.
-```
-- Puis on récupère le retour de cette commande et on la colle dans le fichier .env sous la forme :
-```
-NGINX_PROXY_HEADER_Authorization=Basic <retourDeLaCommande>
-```
-- On rajoute un montage vers ce fichier dans notre service registry ui. 
 - On lance notre docker compose : 
 ```
 docker-compose up -d
 ```
+- Ouvrir le navigateur sur http://localhost:port 
+
 
 -> Vous voilà en pleine possession d'un registre privé avec son interface graphique, son système d'authentification et ses certificats HTTPS
