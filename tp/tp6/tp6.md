@@ -79,14 +79,10 @@ openssl req -newkey rsa:2048 -nodes -keyout nginx/privkey.pem -x509 -days 3650 -
 ```
 - A partir de la commande suivante, ajouter un service au docker-compose qui va également lancer l'interface web pour le registre privé :
 ```
-docker run -d --net registry-ui-net -p 80:80 -e REGISTRY_URL=https://localhost:5000 -e REGISTRY_TITLE="My registry" 
--v "$(pwd)"/nginx/nginx.conf:/etc/nginx/conf.d/default.conf \
--v "$(pwd)"/nginx/fullchain.pem:/etc/nginx/certs/fullchain.pem \
--v "$(pwd)/nginx/privkey.pem:/etc/nginx/certs/privkey.pem \
-joxit/docker-registry-ui:static
+docker run -d --net registry-ui-net -p 80:80 -e NGINX_PROXY_PASS_URL=http://registry:5000 -e REGISTRY_TITLE="My registry" 
+joxit/docker-registry-ui:latest
 ```
 - Penser à inclure une dépendance dans votre docker-compose pour que ce service ne se lance que si le registre privé fonctionne
-- Le fichier nginx.conf permet d'utiliser le conteneur contenant l'ui comme reverse proxy via nginx. Il est donc nécessaire de faire certains ajustement au niveau du service du registry comme la suppression des certificats puisque ceux-ci sont maitenant porté par le reverse proxy
 
 ## Step 6 - Connexion sur l'interface graphique
 - Il est nécessaire de remettre en place une connexion sur notre interface graphique et notre registre (pour éviter que tout le monde puisse pousser ou récupérer des images)
