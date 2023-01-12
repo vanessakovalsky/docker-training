@@ -41,10 +41,10 @@ URL-DE-VOTRE-HOTE/v2/_catalog
 
 - Il est nécessaire d'ajouter une authentification, pour cela utiliser htpasswd (création d'un dossier puis génération depuis notre conteneur du fichier htpasswd)
 ```
-mkdir auth
-docker run --rm \
-    --entrypoint htpasswd \
-    registry:2 -Bbn testuser testpassword > auth/htpasswd
+ mkdir auth
+ docker run \
+  --entrypoint htpasswd \
+  httpd:2 -Bbn testuser testpassword > auth/htpasswd
 ```
 - Le fichier étant généré, il reste à l'utiliser dans notre docker-compose pour restreindre l'accès
 - Ajouter au service du docker compose les informations suivantes (venant encore de la commande docker run donc à adapter)
