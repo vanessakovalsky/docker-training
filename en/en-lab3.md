@@ -110,7 +110,7 @@ docker container run -i --detach -p 80:80 newimagename2
 
 ## Create an assembly with the shared folder :
 
-- weWillNowSetUpTheFileInWhichWeHaveRecoveredTheGitHubDepotOnOurContainer (firstPlaceOurselvesInTheFolderWhereIsTheDepotCode)
+- we Will Now Set Up The File In Which We Have Recovered The GitHub Depot On Our Container (first Place Ourselves In The Folder Where Is The Depot Code)
 
 ```
 docker run -d -it --name devtest --mount type=bind,source="$(pwd)",target=/var/www/html/myapp -p 8090:80 newimagename2
