@@ -25,7 +25,7 @@ docker network create if_wordpress
 - Then we recreate our two containers by attaching them to this network, which will allow our two containers to communicate with each otherr :
 ```
 docker container run --name mysql-container --rm --network if_wordpress -e MYSQL_ROOT_PASSWORD=wordpress -e MYSQL_USER=wordpress -e MYSQL_PASSWORD=wordpress -e MYSQL_DATABASE=wordpress -d mysql:5.7
-docker container run --name wordpress-container --rm --network if_wordpress e WORDPRESS_DB_HOST=172.17.0.1 -e WORDPRESS_DB_PASSWORD=wordpress -e WORDPRESS_DB_USER=wordpress -e WORDPRES_DB_NAME=wordpress  -p 8080:80 -d wordpress
+docker container run --name wordpress-container --rm --network if_wordpress e WORDPRESS_DB_HOST=mysql-container -e WORDPRESS_DB_PASSWORD=wordpress -e WORDPRESS_DB_USER=wordpress -e WORDPRES_DB_NAME=wordpress  -p 8080:80 -d wordpress
 ```
 - We can see that the DB_HOST of Wordress has become the name of our container and no longer its IP.Indeed the use of a dedicated network makes it possible to allow our containers to communicate with each other on any port and that simply using the name (or containerid) of the container with which he wishes to communicate
 
