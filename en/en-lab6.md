@@ -15,6 +15,8 @@ REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
 ## Step 2 - Secure our private register
 
 -To start, create SSL certificates (these are self-generated they generate a warning message in the browser, you can also use Let's Encrypt to obtain certificates recognized by browsers).Handle to do on the host machine)
+
+* On Linux host
 ```
 mkdir certs
 openssl req \
@@ -22,6 +24,10 @@ openssl req \
     -x509 -days 365 -out certs/localhost.crt
 
 ```
+* On Windoows host, to install openssl : https://slproweb.com/products/Win32OpenSSL.html 
+
+
+
 - Now add the following options to the Docker Composed service (these are the options used with a Docker Run for you to transform them into a syntax for Docker-Concomose)
  ```
     -v "$(pwd)"/certs:/certs \         
