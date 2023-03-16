@@ -55,20 +55,20 @@ Url-de-Votre-Hote/V2/_Catalog
     -e "registry_auth = htpasswd" \
     -e "registry_auth_htpasswd_realm = registry realm" \
     -e regisry_auth_htpasswd_path =/author/htpasswd \
-`` `
+```
 - Remember to restart the Docker's application composed
 - The register is now secure
 
 ## Step 4 - Place your images in your private register
 - Start by connecting
-`` `
+```
 Docker Login Url-de-Votre-Host: 5000
 
-`` `
+```
 - Then once the username and the password have seized, it is possible to push its own images (after having commitéw and tagged):
-`` `
+```
 Docker Commit <containerid> Newimage
 Docker Tag Newimage Url-de-Votre-Host: 5000/Newimage
 Docker Push Url-de-Votre-Host: 5000/Newimage: Latest
-`` `
+```
 - the private register is ready to be used
