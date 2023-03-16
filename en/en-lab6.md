@@ -25,8 +25,10 @@ openssl req \
 
 ```
 * On Windoows host, to install openssl : https://slproweb.com/products/Win32OpenSSL.html 
-
-
+```
+'C:\Program Files\OpenSSL-Win64\bin\openssl.exe' req -x509 -sha256 -nodes -days 365 -newkey 
+rsa:2048 -keyout certs/localhost.key -out certs/localhost.crt
+```
 
 - Now add the following options to the Docker Composed service (these are the options used with a Docker Run for you to transform them into a syntax for Docker-Concomose)
  ```
