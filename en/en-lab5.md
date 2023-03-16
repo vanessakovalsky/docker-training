@@ -6,12 +6,12 @@ For this we will use Docker-Concomose which allows you to launch several contain
 ## Manually launch the 2 containers 
 - To start we will launch a new mysql container :
 ```
-docker container run --name mysql-container --rm -p 3306:3306 -e MYSQL_ROOT_PASSWORD=wordpress -d mysql
+docker container run --name mysql-container --rm -p 3306:3306 -e MYSQL_ROOT_PASSWORD=wordpress -e MYSQL_USER=wordpress -e MYSQL_PASSWORD=wordpress -e MYSQL_DATABASE=wordpress -d mysql:5.7
 ```
 - We exhibit Port 3306 which is the default port of use of MySQL so that WordPress can communicate with the database
 - Then we also launch a container with WordPress already installed and the necessary tools configured (Apache and PHP)
 ```
-docker container run --name wordpress-container --rm -e WORDPRESS_DB_HOST=172.17.0.1 -e WORDPRESS_DB_PASSWORD=wordpress -p 8080:80 -d wordpress
+docker container run --name wordpress-container --rm -e WORDPRESS_DB_HOST=172.17.0.1 -e WORDPRESS_DB_PASSWORD=wordpress -e WORDPRESS_DB_USER=wordpress -e WORDPRES_DB_NAME=wordpress -p 8080:80 -d wordpress
 ```
 - We note that we give as an environment parameter a certain number of elements to our container to allow it to communicate with the container of the database, but also the exposure of the port necessary to display our application
 
@@ -24,8 +24,8 @@ docker network create if_wordpress
 ```
 - Then we recreate our two containers by attaching them to this network, which will allow our two containers to communicate with each otherr :
 ```
-docker container run --name mysql-container --rm --network if_wordpress -e MYSQL_ROOT_PASSWORD=wordpress -d mysql
-docker container run --name wordpress-container --rm --network if_wordpress -e WORDPRESS_DB_HOST=mysql-container -e WORDPRESS_DB_PASSWORD=wordpress -p 8080:80 -d wordpress
+docker container run --name mysql-container --rm --network if_wordpress -e MYSQL_ROOT_PASSWORD=wordpress -e MYSQL_USER=wordpress -e MYSQL_PASSWORD=wordpress -e MYSQL_DATABASE=wordpress -d mysql:5.7
+docker container run --name wordpress-container --rm --network if_wordpress e WORDPRESS_DB_HOST=172.17.0.1 -e WORDPRESS_DB_PASSWORD=wordpress -e WORDPRESS_DB_USER=wordpress -e WORDPRES_DB_NAME=wordpress  -p 8080:80 -d wordpress
 ```
 - We can see that the DB_HOST of Wordress has become the name of our container and no longer its IP.Indeed the use of a dedicated network makes it possible to allow our containers to communicate with each other on any port and that simply using the name (or containerid) of the container with which he wishes to communicate
 
@@ -44,7 +44,7 @@ version: '3.1'
 services:
  # Do not use Underscore in the name of the service, it generates errors when using the name as a host
   mysql-container:
-    image: mysql
+    image: mysql:5.7
     ports:
       - 3306:3306
     environment:
