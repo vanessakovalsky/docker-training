@@ -2,7 +2,7 @@
 
 ## Prerequisite :
 - Recover the code in this depot (app.py and requirements.txt):
-https://github.com/praqma-training/docker-katas/tree/master/labs/building-an-image
+[https://github.com/eficode-academy/docker-katas/tree/master/labs/building-an-image](https://github.com/eficode-academy/docker-katas/tree/master/labs/building-an-image)
 
 ## Create the Docker File
 
