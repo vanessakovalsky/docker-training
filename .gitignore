@@ -4,3 +4,5 @@ tp/tp6/corrige/certs/localhost.key
 tp/tp6/corrige/nginx/fullchain.pem
 tp/tp6/corrige/nginx/privkey.pem
 tp/tp6/corrige/nginx/.env
+.vscode/settings.json
+tp/tp7/corrige/.env

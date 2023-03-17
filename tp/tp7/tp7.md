@@ -19,12 +19,14 @@ http://ip_machine:9200/status qui affiche elastic search
 - Pour cela ajouter au docker compose le service filebeat :
 ```
   filebeat:
-    image: docker.elastic.co/beats/filebeat:7.6.2
+    image: docker.elastic.co/beats/filebeat:8.6.2
     command: filebeat -e -strict.perms=false
     #volumnes mount depend on you OS ( Windows or Linux )
     volumes:
-      - ./../docker-elk-filebeat/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-      - ./../docker-elk-filebeat/filebeat/sample_log:/usr/share/filebeat/logs
+      - ./filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    user: root
     networks:
       - elk
     links:
@@ -43,13 +45,18 @@ filebeat.autodiscover:
     - type: docker
       hints.enabled: true
 
+filebeat.inputs:
+- type: container
+  paths:
+  - '/var/lib/docker/containers/*/*.log'
+
 processors:
 - add_cloud_metadata: ~
 
 output.elasticsearch:
-  hosts: ["http://localhost:9200"]
-  username: elastic
-  password: changeme
+  hosts: ['elasticsearch:9200']
+  username: 'elastic'
+  password: 'changeme'
 ```
 - Pour vérifier que cela fonctionne, retourner sur la page de kibana, et valider le formulaire de création d'index (cela indique que Kibana a bien reçu des données)
 - Cherchez dans l'interface de kibana ou sont afficher les logs de notre conteneur ?
