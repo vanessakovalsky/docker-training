@@ -46,12 +46,12 @@ filebeat.autodiscover:
       hints.enabled: true
 
 filebeat.inputs:
-- type: container
-  paths:
-  - '/var/lib/docker/containers/*/*.log'
+   - type: container
+     paths:
+     - '/var/lib/docker/containers/*/*.log'
 
 processors:
-- add_cloud_metadata: ~
+   - add_cloud_metadata: ~
 
 output.elasticsearch:
   hosts: ['elasticsearch:9200']
