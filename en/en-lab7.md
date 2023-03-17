@@ -71,7 +71,7 @@ output.elasticsearch:
 - Let's create a new Docker-Concomose.yml to add a Cadvisor service, which will be responsible for recovering the containers' metrics :
 ```
   cadvisor:
-    image: google/cadvisor
+    image: gcr.io/cadvisor/cadvisor
     container_name: cadvisor
     volumes:
       - /:/rootfs:ro

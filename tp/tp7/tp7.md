@@ -70,7 +70,7 @@ output.elasticsearch:
 - Créons un nouveau docker-compose.yml pour ajouter un service cadvisor, qui sera chargé de récupérer les métriques des conteneurs :
 ```
   cadvisor:
-    image: google/cadvisor
+    image: gcr.io/cadvisor/cadvisor
     container_name: cadvisor
     volumes:
       - /:/rootfs:ro
