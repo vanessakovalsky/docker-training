@@ -1,4 +1,4 @@
-# Lab 6 : Administer containers by centralizing the logs and setting up monitoring
+# Lab 7 : Administer containers by centralizing the logs and setting up monitoring
 
 This TP aims to set up a response to two need: centralize and analyze the logs on the one hand and monitor our Docker containers on the other.
 We will use the Stack Elk for the first need, and a suite composed of Cadvisor, Promotheus and Grafana for the need for monitoring.
@@ -68,7 +68,7 @@ output.elasticsearch:
 
 - Start with Docker composed of lab 5 containing our application, and adding a Cadvisor supervision agent
 
-- Let's create a new Docker-Concomose.yml to add a Cadvisor service, which will be responsible for recovering the containers' metrics :
+- Let's create a new docker-compose.yml to add a Cadvisor service, which will be responsible for recovering the containers' metrics :
 ```
   cadvisor:
     image: gcr.io/cadvisor/cadvisor
