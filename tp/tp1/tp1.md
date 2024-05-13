@@ -11,7 +11,7 @@
 
 ## Step 2 : Installer docker 
 * Démarrer la VM
-* Installer docker : https://www.docker.com/get-started
+* Installer docker : [https://www.docker.com/get-started](https://docs.docker.com/engine/)
 * Une fois l'installation terminée, ouvrez un terminal et taper :
 ```
 docker run hello-world
