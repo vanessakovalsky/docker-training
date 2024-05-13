@@ -42,6 +42,12 @@ To try something more ambitious, you can run an Ubuntu container with:
 Share images, automate workflows, and more with a free Docker ID:
  https://hub.docker.com/
 
+## Installation avec Chocolatey
+
+* Installer Chocolatey : https://chocolatey.org/install
+* Une fois chocolatey installé, ouvrir un PowerShell et taper la commande `choco install docker-engine`
+
+
 For more examples and ideas, visit:
  https://docs.docker.com/get-started/
 ```
