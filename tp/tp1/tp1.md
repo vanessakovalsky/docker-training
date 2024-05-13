@@ -1,8 +1,12 @@
 # TP 1 - Création de l'environnement de travail (VM) et installation de Docker
 
+## Pré-requis Windows 
+
+- Activer HyperV et Conteneurs dans la configuration des applications
+
 ## Step 1 : installation de la VM 
 * Télécharger VirtualBox : https://www.virtualbox.org/wiki/Downloads
-* Une fois installé, créer une VM avec Ubuntu 20.04 dessus avec les caractéristiques suivantes :
+* Une fois installé, créer une VM avec Ubuntu 24.04 dessus avec les caractéristiques suivantes :
 * * 4Go de RAM
 * * 10GO d'espace disque
 * * 2 vcpu (ou plus en fonction de vos config machine)
