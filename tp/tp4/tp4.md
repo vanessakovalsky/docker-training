@@ -19,7 +19,7 @@ RUN apt-get install -y python3-pip python3-dev build-essential
 - Ensuite installer les bibliothèques nécessaires à l'aide pip et du fichier requirements.txt :
 ```
 COPY requirements.txt /usr/src/app/
-RUN pip3 install --no-cache-dir -r /usr/src/app/requirements.txt
+RUN pip3 install --no-cache-dir -r /usr/src/app/requirements.txt  --break-system-packages
 ```
 - Puis copier le fichier de l'application
 ```
