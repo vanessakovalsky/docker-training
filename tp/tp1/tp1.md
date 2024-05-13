@@ -17,6 +17,10 @@
 * Démarrer la VM
 * Installer docker : [https://www.docker.com/get-started](https://docs.docker.com/engine/)
 
+## Installation avec WSL2 sur Windows :
+
+* https://blog.lecacheur.com/2021/11/23/docker-sous-windows-wsl-2-sans-docker-desktop/ 
+
 ## Installation avec Chocolatey sur Windows
 
 * Installer Chocolatey : https://chocolatey.org/install
