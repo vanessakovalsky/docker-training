@@ -12,6 +12,15 @@
 ## Step 2 : Installer docker 
 * Démarrer la VM
 * Installer docker : [https://www.docker.com/get-started](https://docs.docker.com/engine/)
+
+## Installation avec Chocolatey sur Windows
+
+* Installer Chocolatey : https://chocolatey.org/install
+* Une fois chocolatey installé, ouvrir un PowerShell et taper la commande `choco install docker-engine`
+
+
+## Tester l'installation de docker 
+
 * Une fois l'installation terminée, ouvrez un terminal et taper :
 ```
 docker run hello-world
@@ -41,16 +50,8 @@ To try something more ambitious, you can run an Ubuntu container with:
 
 Share images, automate workflows, and more with a free Docker ID:
  https://hub.docker.com/
-
-```
-
-## Installation avec Chocolatey sur Windows
-
-* Installer Chocolatey : https://chocolatey.org/install
-* Une fois chocolatey installé, ouvrir un PowerShell et taper la commande `choco install docker-engine`
-
-
 For more examples and ideas, visit:
  https://docs.docker.com/get-started/
 ```
  * -> Félicitations, votre docker fonctionne ! 
+
