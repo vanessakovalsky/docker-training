@@ -126,7 +126,7 @@ docker run -it --rm --name test-ws \
 * La date qui s'affiche est bien la date attendue.
 * Que s'est-il passé ?
 
-* Avant de passer à la suite, nous allons lancer notre tomorow-ws en mode démonisé
+* Avant de passer à la suite, nous allons construire une image de tomorrow-ws (même image que le time-ws mais avec le fichier tomorrow-ws.php), construire l'image et lancer notre tomorow-ws en mode démonisé
 ```
 docker run -p 8082:80 -d --name tomorrow-ws tomorrow-ws
 ```
@@ -237,7 +237,7 @@ docker run --net time-network -d --name tomorrow-ws \
 ```
 * Accéder à http://localhost:8082, on doit bien voir la date du lendemain s'afficher !
 
-* Pour bien finaliser les choses, nous allons déclarer les variables d'environnement dans le dockerfiel de tomorrow-ws. Cela nous permettra de documenter leur existence ainsi que de leur donner un valeur par défaut.
+* Pour bien finaliser les choses, nous allons déclarer les variables d'environnement dans le dockerfile de tomorrow-ws. Cela nous permettra de documenter leur existence ainsi que de leur donner un valeur par défaut.
 ```Manipuler les ports avec docker run
 FROM php:7.2-apache
 
