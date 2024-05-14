@@ -1,0 +1,2 @@
+<?php
+printf(time());
