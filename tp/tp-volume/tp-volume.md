@@ -22,38 +22,18 @@
 
 ```
 docker run -d -v .:/usr/share/nginx/html -p 8098:80 nginx
-docker: Error response from daemon: create .: volume name is too short, names should be at least two alphanumeric characters.
-See 'docker run --help'.
-```
-
-* Pourquoi ne peut-on pas lier le dossier courant ?
-
--> Docker attend un chemin d'au moins 2 caractère par le cli, il faut alors user d'une petite ruse pour monter le volume :
-
-* Sous linux :
-
-```
-$ docker run -d -v $(pwd):/usr/share/nginx/html -p 8098:80 nginx
-458902306f687604d8a91f4df7269206d582bd383f7ec1866c0b757188bd2e53
-```
-
-* Sous Powershell :
-
-```
-> docker run -d -v ${PWD}:/usr/share/nginx/html -p 8098:80 nginx
-458902306f687604d8a91f4df7269206d582bd383f7ec1866c0b757188bd2e53
-```
-
-* Sous CMD :
-
-```
-> docker run -d -v %cd%:/usr/share/nginx/html -p 8098:80 nginx
 458902306f687604d8a91f4df7269206d582bd383f7ec1866c0b757188bd2e53
 ```
 
 * Si on se rend maintenant sur la page localhost:8098, on verra bien notre index.html
 
 * Modifier le fichier .html dans le répertoire du poste de travail, raffraichir la page. Celle-ci doit avoir changé en conséquence.
+
+* /!\ NB : il est recommandé de donné le chemin absolu vers le dossier en cas de montage de type bind ou d'utiliser la syntaxe suivante :
+
+```
+docker run -d --mount source=.,target=/usr/share/nginx/html,type=bind -p 8098:80 nginx
+```
 
 
 ## Utiliser un volume de type Volume
