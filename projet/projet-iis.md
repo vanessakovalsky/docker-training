@@ -5,5 +5,6 @@
   * Créer un docker compose contenant :
       * le service avec l'applciation
       * un réseau pour celle-ci
+      * un volume pour partager des fichiers de configuration de l'application
    
     
