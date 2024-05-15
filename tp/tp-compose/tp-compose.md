@@ -6,12 +6,12 @@ Pour cela nous allons utiliser  docker-compose qui permet de lancer en même tem
 ## Lancer manuellement les 2 conteneurs 
 - Pour démarrer nous allons lancer un nouveau conteneur mysql :
 ```
-docker container run --name mysql-container --rm -p 3306:3306 -e MYSQL_ROOT_PASSWORD=wordpress -d mysql
+docker container run --name mysql-container --rm -p 3306:3306 -e MYSQL_ROOT_PASSWORD=wordpress -e MYSQL_DATABASE=exampledb -e MYSQL_USER=exampleuser -e MYSQL_PASSWORD=examplepass -d mysql:5.7
 ```
 - Nous exposons le port 3306 qui est le port par défaut d'utilisation de mysql pour que Wordpress puisse communiquer avec la base de données
 - Puis nous lançons également un conteneur avec wordpress déjà installé et les outils nécessaires configurés (apache et PHP)
 ```
-docker container run --name wordpress-container --rm -e WORDPRESS_DB_HOST=172.17.0.1 -e WORDPRESS_DB_PASSWORD=wordpress -p 8080:80 -d wordpress
+docker container run --name wordpress-container --rm -e WORDPRESS_DB_HOST=172.17.0.1 -e WORDPRESS_DB_PASSWORD=wordpress -e WORDPRESS_DB_USER=exampleuser -e WORDPRESS_DB_NAME=exampledb -p 8080:80 -d wordpress
 ```
 - On constate que l'on donne en paramètre d'environnement un certain nombre d'éléments à notre conteneur pour lui permettre de communiquer avec le conteneur de la base de données, mais aussi l'exposition du port nécessaire pour afficher notre application
 
@@ -23,8 +23,8 @@ docker network create if_wordpress
 ```
 - Ensuite nous recréons nos deux conteneurs en les rattachant à ce réseau, ce qui permettra à nos deux conteneurs de communiquer entre eux :
 ```
-docker container run --name mysql-container --rm --network if_wordpress -e MYSQL_ROOT_PASSWORD=wordpress -d mysql
-docker container run --name wordpress-container --rm --network if_wordpress -e WORDPRESS_DB_HOST=mysql-container -e WORDPRESS_DB_PASSWORD=wordpress -p 8080:80 -d wordpress
+docker container run --name mysql-container --rm --network if_wordpress -e MYSQL_ROOT_PASSWORD=wordpress -e MYSQL_DATABASE=exampledb -e MYSQL_USER=exampleuser -e MYSQL_PASSWORD=examplepass -d mysql:5.7
+docker container run --name wordpress-container --rm --network if_wordpress -e WORDPRESS_DB_HOST=mysql-container -e WORDPRESS_DB_PASSWORD=examplepass -e WORDPRESS_DB_USER=exampleuser -e WORDPRESS_DB_NAME=exampledb -p 8080:80 -d wordpress
 ```
 - On peut constater que le db_host de wordress est devenu le nom de notre conteneur et non plus son IP. En effet l'utilisation d'un réseau dédié permet d'autoriser à nos conteneurs de communiquer entre eux sur n'importe quel port et cela simplement en utilisant le nom (ou le containerID) du conteneur avec lequel il souhaite communiquer.
 
