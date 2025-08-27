@@ -1,4 +1,4 @@
-# Application 12-Factor complète
+# Application 12-Factor complète
 
 ## Objectif
 
