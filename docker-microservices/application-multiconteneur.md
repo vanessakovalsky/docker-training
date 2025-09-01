@@ -60,13 +60,13 @@ app.listen(3000);
   "description": "API Express avec cache Redis et base de données PostgreSQL",
   "main": "api/app.js",
   "scripts": {
-    "start": "node api/app.js",
+    "start": "node api/app.js"
   },
   "dependencies": {
     "express": "^4.18.2",
     "redis": "^4.6.12",
     "pg": "^8.11.3"
-  },
+  }
 }
 ```
 
