@@ -84,6 +84,8 @@ requests==2.31.0
 
 ### Dockerfile
 * Créer un Dockerfile qui va permettre contenir les éléments suivants :
+    * Image de base : python:3.9-slim
+    * Dossier de travail : app
     * copie du fichier de dépendances
     * Installation des dépendances,
     * copier le fichier app.py
@@ -109,7 +111,7 @@ requests==2.31.0
         EXPOSE 5000
         CMD ["python", "app.py"]
         ```
-</details
+</details>
     
 ## Étape 2 : Service B - API Gateway avec Health Check (15 min)
 
@@ -186,24 +188,29 @@ if __name__ == '__main__':
 ```
 
 ### Dockerfile
-```dockerfile
-FROM python:3.9-slim
+* Créer le fichier Dockerfile avec les mêms éléments que celui du service précédent mais en utilisant le port 5001 + une commande d'installation de curl : "apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*"
 
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-COPY app.py .
-
-# Health check avec curl
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-
-HEALTHCHECK --interval=15s --timeout=3s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:5001/health || exit 1
-
-EXPOSE 5001
-CMD ["python", "app.py"]
-```
+<details>
+  <summary>Fichier dockerfile complet</summary>
+    ```dockerfile
+    FROM python:3.9-slim
+    
+    WORKDIR /app
+    COPY requirements.txt .
+    RUN pip install -r requirements.txt
+    
+    COPY app.py .
+    
+    # Health check avec curl
+    RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+    
+    HEALTHCHECK --interval=15s --timeout=3s --start-period=10s --retries=3 \
+      CMD curl -f http://localhost:5001/health || exit 1
+    
+    EXPOSE 5001
+    CMD ["python", "app.py"]
+    ```
+</details>
 
 ## Étape 3 : Service A - Frontend avec Circuit Breaker (20 min)
 
@@ -440,73 +447,85 @@ if __name__ == '__main__':
 ```
 
 ### Dockerfile
-```dockerfile
-FROM python:3.9-slim
+* Créer le fichier Dockerfile avec les mêms éléments que celui du service préédent mais en utilisant le port 5002
+<details>
+  <summary>Fichier dockerfile complet</summary>
+    ```dockerfile
+    FROM python:3.9-slim
+    
+    WORKDIR /app
+    COPY requirements.txt .
+    RUN pip install -r requirements.txt
+    
+    COPY app.py .
+    
+    RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+    
+    HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+      CMD curl -f http://localhost:5002/health || exit 1
+    
+    EXPOSE 5002
+    CMD ["python", "app.py"]
+    ```
+</details>
 
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-COPY app.py .
-
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-
-HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-  CMD curl -f http://localhost:5002/health || exit 1
-
-EXPOSE 5002
-CMD ["python", "app.py"]
-```
 
 ## Étape 4 : Docker Compose (10 min)
 
 ### docker-compose.yml
-```yaml
-version: '3.8'
+* Ecrire le fichier docker compose qui permet de lancer les trois services
+* Pensez à inclure le build du bon dossier pour chaque service ainsi que le mapping de port
+* Le service b et le service a ont également besoin d'une variable d'environnement
 
-services:
-  service-c:
-    build: ./service-c
-    container_name: database-service
-    ports:
-      - "5000:5000"
+<details>
+  <summary>Fichier docker-compose.yml complet</summary>
+    ```yaml
+    version: '3.8'
+    
+    services:
+      service-c:
+        build: ./service-c
+        container_name: database-service
+        ports:
+          - "5000:5000"
+        networks:
+          - microservices-net
+        restart: unless-stopped
+    
+      service-b:
+        build: ./service-b
+        container_name: api-gateway
+        ports:
+          - "5001:5001"
+        depends_on:
+          - service-c
+        networks:
+          - microservices-net
+        restart: unless-stopped
+        environment:
+          - SERVICE_C_URL=http://service-c:5000
+    
+      service-a:
+        build: ./service-a
+        container_name: frontend
+        ports:
+          - "5002:5002"
+        depends_on:
+          - service-b
+        networks:
+          - microservices-net
+        restart: unless-stopped
+        environment:
+          - SERVICE_B_URL=http://service-b:5001
+    
     networks:
-      - microservices-net
-    restart: unless-stopped
-
-  service-b:
-    build: ./service-b
-    container_name: api-gateway
-    ports:
-      - "5001:5001"
-    depends_on:
-      - service-c
-    networks:
-      - microservices-net
-    restart: unless-stopped
-    environment:
-      - SERVICE_C_URL=http://service-c:5000
-
-  service-a:
-    build: ./service-a
-    container_name: frontend
-    ports:
-      - "5002:5002"
-    depends_on:
-      - service-b
-    networks:
-      - microservices-net
-    restart: unless-stopped
-    environment:
-      - SERVICE_B_URL=http://service-b:5001
-
-networks:
-  microservices-net:
-    driver: bridge
-
-volumes:
-  app-data:
-```
+      microservices-net:
+        driver: bridge
+    
+    volumes:
+      app-data:
+    ```
+</details>
 
 ## Instructions d'exécution
 
