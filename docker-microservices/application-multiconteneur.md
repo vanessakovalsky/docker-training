@@ -51,6 +51,38 @@ app.get('/users/:id', async (req, res) => {
 app.listen(3000);
 ```
 
+1-bis **api/package.json**
+
+```
+{
+  "name": "express-redis-postgres-api",
+  "version": "1.0.0",
+  "description": "API Express avec cache Redis et base de données PostgreSQL",
+  "main": "api/app.js",
+  "scripts": {
+    "start": "node api/app.js",
+    "dev": "nodemon api/app.js",
+    "test": "jest",
+    "lint": "eslint api/",
+    "lint:fix": "eslint api/ --fix"
+  },
+  "keywords": [
+    "express",
+    "redis",
+    "postgresql",
+    "api",
+    "cache"
+  ],
+  "author": "Votre nom",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "redis": "^4.6.12",
+    "pg": "^8.11.3"
+  },
+}
+```
+
 2. **Docker Compose**
 ```yaml
 version: '3.8'
