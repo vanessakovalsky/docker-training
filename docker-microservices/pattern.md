@@ -83,23 +83,34 @@ requests==2.31.0
 ```
 
 ### Dockerfile
-```dockerfile
-FROM python:3.9-slim
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-COPY app.py .
-
-# Health check Docker natif
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+* Créer un Dockerfile qui va permettre contenir les éléments suivants :
+    * copie du fichier de dépendances
+    * Installation des dépendances,
+    * copier le fichier app.py
+    * Mettre en place le Healthcheck avec la commande suivante : HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:5000/health || exit 1
-
-EXPOSE 5000
-CMD ["python", "app.py"]
-```
-
+    * Exposer le port 5000
+    * Commande de démarrage : python app.py
+<details>
+  <summary>Fichier dockerfile complet</summary>
+        ```dockerfile
+        FROM python:3.9-slim
+        
+        WORKDIR /app
+        COPY requirements.txt .
+        RUN pip install -r requirements.txt
+        
+        COPY app.py .
+        
+        # Health check Docker natif
+        HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+          CMD curl -f http://localhost:5000/health || exit 1
+        
+        EXPOSE 5000
+        CMD ["python", "app.py"]
+        ```
+</details
+    
 ## Étape 2 : Service B - API Gateway avec Health Check (15 min)
 
 ### Structure des fichiers
