@@ -11,6 +11,7 @@ Web App ←→ Redis Cache ←→ PostgreSQL
 1. **Service Web (API)**
 ```javascript
 // api/app.js
+// api/app.js
 const express = require('express');
 const redis = require('redis');
 const { Pool } = require('pg');
@@ -19,8 +20,23 @@ const app = express();
 app.use(express.json());
 
 const redisClient = redis.createClient({
-    host: process.env.REDIS_HOST || 'localhost'
+    socket: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: 6379
+    }
 });
+
+// Gestion des erreurs Redis
+redisClient.on('error', (err) => {
+    console.error('Erreur Redis:', err);
+});
+
+redisClient.on('connect', () => {
+    console.log('Connecté à Redis');
+});
+
+// Connexion à Redis (obligatoire avec redis v4+)
+redisClient.connect().catch(console.error);
 
 const pool = new Pool({
     host: process.env.DB_HOST,
@@ -43,7 +59,7 @@ app.get('/users/:id', async (req, res) => {
     const user = result.rows[0];
     
     // Cache result
-    await redisClient.setex(`user:${userId}`, 300, JSON.stringify(user));
+    // await redisClient.setex(`user:${userId}`, 300, JSON.stringify(user));
     
     res.json({ source: 'database', data: user });
 });
