@@ -58,9 +58,9 @@ app.listen(3000);
   "name": "express-redis-postgres-api",
   "version": "1.0.0",
   "description": "API Express avec cache Redis et base de données PostgreSQL",
-  "main": "api/app.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node api/app.js"
+    "start": "node app.js"
   },
   "dependencies": {
     "express": "^4.18.2",
