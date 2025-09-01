@@ -95,7 +95,8 @@ requests==2.31.0
     * Commande de démarrage : python app.py
 <details>
   <summary>Fichier dockerfile complet</summary>
-        ```dockerfile
+
+        ```dockerfile    
         FROM python:3.9-slim
         
         WORKDIR /app
@@ -192,6 +193,7 @@ if __name__ == '__main__':
 
 <details>
   <summary>Fichier dockerfile complet</summary>
+
     ```dockerfile
     FROM python:3.9-slim
     
@@ -450,6 +452,7 @@ if __name__ == '__main__':
 * Créer le fichier Dockerfile avec les mêms éléments que celui du service préédent mais en utilisant le port 5002
 <details>
   <summary>Fichier dockerfile complet</summary>
+
     ```dockerfile
     FROM python:3.9-slim
     
@@ -479,6 +482,7 @@ if __name__ == '__main__':
 
 <details>
   <summary>Fichier docker-compose.yml complet</summary>
+
     ```yaml
     version: '3.8'
     
