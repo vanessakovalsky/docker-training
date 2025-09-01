@@ -22,7 +22,7 @@ app.use(express.json());
 const redisClient = redis.createClient({
     socket: {
         host: process.env.REDIS_HOST || 'localhost',
-        port: 6379
+        port: process.env.REDIS_PORT || 6379
     }
 });
 
@@ -59,7 +59,7 @@ app.get('/users/:id', async (req, res) => {
     const user = result.rows[0];
     
     // Cache result
-    // await redisClient.setex(`user:${userId}`, 300, JSON.stringify(user));
+    await redisClient.set(`user:${userId}`, 300, JSON.stringify(user));
     
     res.json({ source: 'database', data: user });
 });
