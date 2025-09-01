@@ -61,20 +61,7 @@ app.listen(3000);
   "main": "api/app.js",
   "scripts": {
     "start": "node api/app.js",
-    "dev": "nodemon api/app.js",
-    "test": "jest",
-    "lint": "eslint api/",
-    "lint:fix": "eslint api/ --fix"
   },
-  "keywords": [
-    "express",
-    "redis",
-    "postgresql",
-    "api",
-    "cache"
-  ],
-  "author": "Votre nom",
-  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
     "redis": "^4.6.12",
