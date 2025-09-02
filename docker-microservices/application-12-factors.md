@@ -761,14 +761,18 @@ pytest==7.4.0
 # 1. Construire et démarrer
 docker compose up -d --build
 
-# 3. Tester l'API
+# . Tester l'API
 curl http://localhost:8080/health
 curl -X POST http://localhost:8080/users \
   -H "Content-Type: application/json" \
   -d '{"name": "john", "email": "john@example.com"}'
 
+# 3. Se connecter au conteneur
+docker compose exec -it api bash
+
 # 4. Lancer les tests
 pytest tests/ -v
+
 ```
 
 ## Points clés de l'implémentation
@@ -778,6 +782,7 @@ pytest tests/ -v
 
 <details>
     <summary>Solution proposée</summary>
+    
     1. **Codebase** : Code source unique avec déploiements multiples
     2. **Dependencies** : `requirements.txt` avec versions fixes
     3. **Config** : Variables d'environnement pour toute la configuration
