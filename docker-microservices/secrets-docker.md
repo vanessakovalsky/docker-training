@@ -1,4 +1,4 @@
-# Configuration des secrets Docker
+# Configuration des secrets Docker
 
 ## Objectif
 
