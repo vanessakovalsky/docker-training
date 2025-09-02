@@ -12,8 +12,10 @@
 4. Tester la sécurité
 
 **Fichiers à créer** :
-
+* Pour commencer et avoir la possibilité de gérer le secret nous allons activer docker swarm puis nous allons créer les secrets
 ```bash
+# Initialisation de docker
+dowker swarm init 
 # Création des secrets
 mkdir secrets
 echo "super_secret_password" | docker secret create db_password -
