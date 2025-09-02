@@ -284,20 +284,20 @@ class DatabaseManager:
 ### 4. Application principale (`app.py`)
 
 ```python
+# app.py - Version corrigée pour Flask 2.2+
 import os
 import sys
 import logging
 import signal
 from flask import Flask, jsonify, request
-from config import Config
-from database import DatabaseManager
-from models import User
+from dataclasses import dataclass, asdict
+from typing import List, Optional
+import threading
 
 # Configuration du logging
-config = Config()
 logging.basicConfig(
-    level=getattr(logging, config.LOG_LEVEL.upper()),
-    format=config.LOG_FORMAT,
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[logging.StreamHandler(sys.stdout)]
 )
 
@@ -305,10 +305,96 @@ logger = logging.getLogger(__name__)
 
 # Initialisation de l'application
 app = Flask(__name__)
-app.config['SECRET_KEY'] = config.SECRET_KEY
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-change-me')
+
+# Base de données simulée en mémoire (pour éviter PostgreSQL au début)
+users_storage = []
+next_id = 1
+db_lock = threading.Lock()
+
+@dataclass
+class User:
+    id: Optional[int] = None
+    username: str = ""
+    email: str = ""
+    
+    def to_dict(self):
+        return asdict(self)
+
+class DatabaseManager:
+    """Gestionnaire de base de données simulé en mémoire"""
+    
+    def __init__(self):
+        self.initialized = False
+    
+    def init_tables(self):
+        """Initialiser les tables (simulation)"""
+        if not self.initialized:
+            logger.info("Database tables initialized (memory storage)")
+            self.initialized = True
+    
+    def health_check(self) -> bool:
+        """Vérification de santé de la DB"""
+        return self.initialized
+    
+    def create_user(self, user: User) -> User:
+        """Créer un utilisateur"""
+        global next_id
+        with db_lock:
+            # Vérifier les doublons
+            for existing_user in users_storage:
+                if existing_user.username == user.username or existing_user.email == user.email:
+                    raise ValueError("User already exists")
+            
+            user.id = next_id
+            next_id += 1
+            users_storage.append(user)
+            return user
+    
+    def get_users(self) -> List[User]:
+        """Récupérer tous les utilisateurs"""
+        with db_lock:
+            return users_storage.copy()
+    
+    def get_user_by_id(self, user_id: int) -> Optional[User]:
+        """Récupérer un utilisateur par ID"""
+        with db_lock:
+            return next((u for u in users_storage if u.id == user_id), None)
+    
+    def update_user(self, user_id: int, user: User) -> Optional[User]:
+        """Mettre à jour un utilisateur"""
+        with db_lock:
+            existing_user = next((u for u in users_storage if u.id == user_id), None)
+            if not existing_user:
+                return None
+            
+            # Vérifier les doublons (sauf pour l'utilisateur actuel)
+            for u in users_storage:
+                if u.id != user_id and (u.username == user.username or u.email == user.email):
+                    raise ValueError("Username or email already exists")
+            
+            existing_user.username = user.username
+            existing_user.email = user.email
+            return existing_user
+    
+    def delete_user(self, user_id: int) -> bool:
+        """Supprimer un utilisateur"""
+        with db_lock:
+            user = next((u for u in users_storage if u.id == user_id), None)
+            if user:
+                users_storage.remove(user)
+                return True
+            return False
 
 # Initialisation de la base de données
-db_manager = DatabaseManager(config)
+db_manager = DatabaseManager()
+
+# Initialisation au démarrage de l'application
+def initialize_app():
+    """Initialiser l'application au démarrage"""
+    logger.info("Initializing application...")
+    db_manager.init_tables()
+    logger.info("Application initialized successfully")
 
 # Gestion gracieuse de l'arrêt
 def signal_handler(signum, frame):
@@ -318,12 +404,7 @@ def signal_handler(signum, frame):
 signal.signal(signal.SIGTERM, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)
 
-@app.before_first_request
-def initialize_database():
-    logger.info("Initializing database...")
-    db_manager.init_tables()
-    logger.info("Application started successfully")
-
+# Routes de l'API
 @app.route('/health', methods=['GET'])
 def health():
     """Health check endpoint"""
@@ -372,6 +453,9 @@ def create_user():
         logger.info(f"Created user: {created_user.username}")
         return jsonify(created_user.to_dict()), 201
         
+    except ValueError as e:
+        logger.warning(f"User creation failed: {e}")
+        return jsonify({"error": str(e)}), 409
     except Exception as e:
         logger.error(f"Failed to create user: {e}")
         return jsonify({"error": "Internal server error"}), 500
@@ -407,6 +491,9 @@ def update_user(user_id):
         logger.info(f"Updated user: {updated_user.username}")
         return jsonify(updated_user.to_dict())
         
+    except ValueError as e:
+        logger.warning(f"User update failed: {e}")
+        return jsonify({"error": str(e)}), 409
     except Exception as e:
         logger.error(f"Failed to update user {user_id}: {e}")
         return jsonify({"error": "Internal server error"}), 500
@@ -437,18 +524,24 @@ def internal_error(error):
     return jsonify({"error": "Internal server error"}), 500
 
 if __name__ == '__main__':
-    logger.info(f"Starting server on {config.HOST}:{config.PORT}")
-    app.run(host=config.HOST, port=config.PORT, debug=(config.FLASK_ENV == 'development'))
+    # Initialiser l'application
+    initialize_app()
+    
+    # Configuration du serveur
+    port = int(os.environ.get('PORT', 8080))
+    host = os.environ.get('HOST', '0.0.0.0')
+    debug_mode = os.environ.get('FLASK_ENV') == 'development'
+    
+    logger.info(f"Starting server on {host}:{port}")
+    app.run(host=host, port=port, debug=debug_mode)
 ```
 
 ### 5. Dockerfile multi-stage
 
 * Créer le dockerfile avec les consignes suivantes :
-    * Image de base : python:3.11-slim et lui donner un alias 
+    * Image de base : python:3.11-slim  
     * Copier le fichier de dépendances et faites l'installations des dépendances
-    * Dans une deuxième étape à partir de la même image de base, ajouter un group appuser et un user appuser
     * Utiliser le dossier de travail app
-    * Copier les dépendances depuis la première étape du dossier /root/.local vers le même dossier pour récupérer les dépendances
     * Copier les fichiers de lapplication
     * Définir le proprietaire et le groupe du dossier app à : appuser
     * Définir l'utilisateur comme appuser
@@ -462,22 +555,14 @@ if __name__ == '__main__':
     
     ```dockerfile
     # Build stage
-    FROM python:3.11-slim as builder
+    FROM python:3.11-slim
     
     WORKDIR /app
     COPY requirements.txt .
-    RUN pip install --no-cache-dir --user -r requirements.txt
-    
-    # Runtime stage
-    FROM python:3.11-slim
+    RUN pip install --no-cache-dir -r requirements.txt
     
     # Create non-root user
     RUN groupadd -r appuser && useradd -r -g appuser appuser
-    
-    WORKDIR /app
-    
-    # Copy dependencies from builder stage
-    COPY --from=builder /root/.local /root/.local
     
     # Copy application code
     COPY . .
