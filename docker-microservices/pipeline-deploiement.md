@@ -7,8 +7,7 @@
 ## Consignes
 
 1. Créez un repository Git avec l'application de l'exercice précédent
-2. Configurez Gitlab CI pour :
-   - Exécuter les tests
+2. Ajouter le pipeline Gitlab CI pour :
    - Builder l'image Docker
    - Pusher vers un registry
 3. Lancer l'application avec Docker Compose sur votre poste en utilisant l'image poussez sur la registry
@@ -16,42 +15,25 @@
 **Template Gitlab CI**
 
 ```yaml
+image: docker:20.10.24 # image principale (contient docker client + apk)
+
 services:
-- docker:dind
+  - docker:dind
 
 stages:
-- test
-- build
-
-variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-
-before_script:
-  - python --version
-  - pip install --upgrade pip
-  - pip install -r requirements.txt
-test:
-  stage: test
-  script:
-    - pytest --junitxml=report.xml
-  artifacts:
-    reports:
-      junit: report.xml
-    paths:
-      - .pytest_cache/
-    expire_in: 1 week
+  - build
 
 build:
-    stage: build
-    before_script:
-        - apk add --no-cache py3-pip
-        - pip install lastversion
-        - docker login -u ${DEPLOY_USER} -p ${DEPLOY_TOKEN} registry.gitlab.com
-    script:
-        - LASTVERSION=`lastversion ansible-community/ansible-lint`
-        - docker build --build-arg VERSION=${LASTVERSION} -t registry.gitlab.com/dockerfiles6/ansible-lint:${LASTVERSION} -t registry.gitlab.com/dockerfiles6/ansible-lint:latest .
-        - docker push registry.gitlab.com/dockerfiles6/ansible-lint:${LASTVERSION}
-        - docker push registry.gitlab.com/dockerfiles6/ansible-lint:latest
+  stage: build
+  before_script:
+    - apk add --no-cache py3-pip
+    - pip install lastversion
+    - echo "${CI_JOB_TOKEN}" | docker login registry.gitlab.com --username gitlab-ci-token --password-stdin
+  script:
+    - LASTVERSION=$(lastversion ansible-community/ansible-lint)
+    - docker build -t registry.gitlab.com/vanessakovalibre/12-factors-app-python:latest .
+    - docker push registry.gitlab.com/vanessakovalibre/12-factors-app-python:latest
+
 ```
 
 **Template GitHub Actions** :
