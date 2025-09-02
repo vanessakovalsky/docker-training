@@ -501,49 +501,55 @@ if __name__ == '__main__':
 
 
 ### 6. Docker Compose
+* Mettre en place le docher compose avec le service api et un service bdd avec postgresql
 
-```yaml
-version: '3.8'
-
-services:
-  api:
-    build: .
-    ports:
-      - "8080:8080"
-    environment:
-      - DATABASE_URL=postgresql://userdb:password@db:5432/userdb
-      - LOG_LEVEL=INFO
-      - FLASK_ENV=development
-    depends_on:
-      - db
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  db:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_DB=userdb
-      - POSTGRES_USER=userdb
-      - POSTGRES_PASSWORD=password
-    ports:
-      - "5432:5432"
+<details>
+    <summary>Docker compose complet</summary>
+    
+    ```yaml
+    version: '3.8'
+    
+    services:
+      api:
+        build: .
+        ports:
+          - "8080:8080"
+        environment:
+          - DATABASE_URL=postgresql://userdb:password@db:5432/userdb
+          - LOG_LEVEL=INFO
+          - FLASK_ENV=development
+        depends_on:
+          - db
+        restart: unless-stopped
+        healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+          interval: 30s
+          timeout: 10s
+          retries: 3
+          start_period: 40s
+    
+      db:
+        image: postgres:15-alpine
+        environment:
+          - POSTGRES_DB=userdb
+          - POSTGRES_USER=userdb
+          - POSTGRES_PASSWORD=password
+        ports:
+          - "5432:5432"
+        volumes:
+          - postgres_data:/var/lib/postgresql/data
+        restart: unless-stopped
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U userdb -d userdb"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+    
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U userdb -d userdb"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  postgres_data:
+      postgres_data:
 ```
+
+</details>
 
 ### 7. Tests d'intégration
 
@@ -599,7 +605,7 @@ git clone <repo>
 cd twelve-factor-app
 
 # 2. Construire et démarrer
-docker-compose up --build
+docker compose up -d --build
 
 # 3. Tester l'API
 curl http://localhost:8080/health
