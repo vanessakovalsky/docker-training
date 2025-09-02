@@ -728,13 +728,13 @@ class TestUserAPI:
     
     def test_create_user(self):
         user_data = {
-            "username": "testuser",
+            "name": "testuser",
             "email": "test@example.com"
         }
         response = requests.post(f"{self.base_url}/users", json=user_data)
         assert response.status_code == 201
         data = response.json()
-        assert data["username"] == user_data["username"]
+        assert data["name"] == user_data["name"]
         assert data["email"] == user_data["email"]
         assert "id" in data
     
