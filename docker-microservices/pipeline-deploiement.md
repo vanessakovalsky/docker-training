@@ -15,7 +15,7 @@
 
 **Template Gitlab CI**
 
-``ỳaml
+```yaml
 services:
 - docker:dind
 
