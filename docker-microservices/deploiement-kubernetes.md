@@ -1,7 +1,6 @@
 # Déploiement multi-environnements
 
 ## Pré-requis
-- installer minikube sur son poste : https://minikube.sigs.k8s.io/docs/start/?arch=%2Flinux%2Fx86-64%2Fstable%2Fbinary+download
 - Docker et Docker Compose installés
 - Minikube installé et configuré : https://minikube.sigs.k8s.io/docs/start/?arch=%2Flinux%2Fx86-64%2Fstable%2Fbinary+download
 - kubectl installé : https://kubernetes.io/fr/docs/tasks/tools/install-kubectl/
