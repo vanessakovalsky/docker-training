@@ -190,7 +190,7 @@ class DatabaseManager:
                 
                 # Créer un index sur name et email pour les recherches
                 cursor.execute("""
-                    CREATE INDEX IF NOT EXISTS idx_users_username ON users(name);
+                    CREATE INDEX IF NOT EXISTS idx_users_name ON users(name);
                 """)
                 cursor.execute("""
                     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
@@ -501,21 +501,21 @@ def create_user():
     try:
         data = request.get_json()
         
-        if not data or not data.get('username') or not data.get('email'):
-            return jsonify({"error": "Username and email are required"}), 400
+        if not data or not data.get('name') or not data.get('email'):
+            return jsonify({"error": "name and email are required"}), 400
         
-        logger.info(f"Creating user: {data['username']}")
-        user = User(username=data['username'], email=data['email'])
+        logger.info(f"Creating user: {data['name']}")
+        user = User(name=data['name'], email=data['email'])
         created_user = db_manager.create_user(user)
         
-        logger.info(f"Created user: {created_user.username} with ID: {created_user.id}")
+        logger.info(f"Created user: {created_user.name} with ID: {created_user.id}")
         return jsonify(created_user.to_dict()), 201
         
     except Exception as e:
         logger.error(f"Failed to create user: {e}")
         # Vérifier si c'est une erreur de contrainte d'unicité
         if "duplicate key" in str(e).lower() or "unique constraint" in str(e).lower():
-            return jsonify({"error": "Username or email already exists"}), 409
+            return jsonify({"error": "name or email already exists"}), 409
         return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/users/<int:user_id>', methods=['GET'])
@@ -538,24 +538,24 @@ def update_user(user_id):
     try:
         data = request.get_json()
         
-        if not data or not data.get('username') or not data.get('email'):
-            return jsonify({"error": "Username and email are required"}), 400
+        if not data or not data.get('name') or not data.get('email'):
+            return jsonify({"error": "name and email are required"}), 400
         
         logger.info(f"Updating user with ID: {user_id}")
-        user = User(username=data['username'], email=data['email'])
+        user = User(name=data['name'], email=data['email'])
         updated_user = db_manager.update_user(user_id, user)
         
         if not updated_user:
             return jsonify({"error": "User not found"}), 404
         
-        logger.info(f"Updated user: {updated_user.username}")
+        logger.info(f"Updated user: {updated_user.name}")
         return jsonify(updated_user.to_dict())
         
     except Exception as e:
         logger.error(f"Failed to update user {user_id}: {e}")
         # Vérifier si c'est une erreur de contrainte d'unicité
         if "duplicate key" in str(e).lower() or "unique constraint" in str(e).lower():
-            return jsonify({"error": "Username or email already exists"}), 409
+            return jsonify({"error": "name or email already exists"}), 409
         return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/users/<int:user_id>', methods=['DELETE'])
