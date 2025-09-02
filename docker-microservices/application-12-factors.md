@@ -128,7 +128,7 @@ class User:
         return json.dumps(self.to_dict(), default=str)
     
     def __str__(self):
-        return f"User(id={self.id}, username='{self.name}', email='{self.email}')"
+        return f"User(id={self.id}, name='{self.name}', email='{self.email}')"
     
     def __repr__(self):
         return self.__str__()
@@ -769,7 +769,7 @@ docker compose up -d --build
 curl http://localhost:8080/health
 curl -X POST http://localhost:8080/users \
   -H "Content-Type: application/json" \
-  -d '{"username": "john", "email": "john@example.com"}'
+  -d '{"name": "john", "email": "john@example.com"}'
 
 # 4. Lancer les tests
 pytest tests/ -v
