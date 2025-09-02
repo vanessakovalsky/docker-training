@@ -610,7 +610,7 @@ if __name__ == '__main__':
     app.run(host=config.HOST, port=config.PORT, debug=(config.FLASK_ENV == 'development'))
 ```
 
-### 5. Dockerfile multi-stage
+### 5. Dockerfile
 
 * Créer le dockerfile avec les consignes suivantes :
     * Image de base : python:3.11-slim  
@@ -706,8 +706,7 @@ if __name__ == '__main__':
     
     volumes:
       postgres_data:
-```
-
+    ```
 </details>
 
 ### 7. Tests d'intégration
