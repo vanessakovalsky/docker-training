@@ -758,11 +758,7 @@ pytest==7.4.0
 ## Commandes pour exécuter l'exercice
 
 ```bash
-# 1. Cloner et configurer
-git clone <repo>
-cd twelve-factor-app
-
-# 2. Construire et démarrer
+# 1. Construire et démarrer
 docker compose up -d --build
 
 # 3. Tester l'API
