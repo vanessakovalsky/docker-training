@@ -13,7 +13,7 @@
    - Pusher vers un registry
 3. Lancer l'application avec Docker Compose sur votre poste en utilisant l'image poussez sur la registry
 
-** Template Gitlab CI **
+**Template Gitlab CI**
 
 ``ỳaml
 services:
