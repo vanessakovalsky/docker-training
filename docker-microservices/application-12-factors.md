@@ -67,10 +67,8 @@ twelve-factor-app/
 ├── docker-compose.yml   # Orchestration
 ├── tests/
 │   ├── test_api.py      # Tests d'intégration
-│   └── test_health.py   # Tests health checks
 ├── scripts/
-│   └── init_db.py       # Script d'initialisation DB
-└── .env.example         # Exemple de configuration
+│   └── init_db.py       # Script d'initialisation DB : reprendre le même que l'exercice précédents
 ```
 
 ## Implémentation complète
@@ -78,6 +76,7 @@ twelve-factor-app/
 ### 1. Configuration centralisée (`config.py`)
 
 ```python
+# config.py - Configuration centralisée
 import os
 from dataclasses import dataclass
 
@@ -108,6 +107,7 @@ class Config:
 ### 2. Modèles de données (`models.py`)
 
 ```python
+# models.py - Modèles de données
 from dataclasses import dataclass, asdict
 from typing import Optional
 import json
@@ -115,21 +115,29 @@ import json
 @dataclass
 class User:
     id: Optional[int] = None
-    username: str = ""
+    name: str = ""
     email: str = ""
     created_at: Optional[str] = None
-    updated_at: Optional[str] = None
     
     def to_dict(self):
+        """Convertir l'objet User en dictionnaire"""
         return asdict(self)
     
     def to_json(self):
+        """Convertir l'objet User en JSON"""
         return json.dumps(self.to_dict(), default=str)
+    
+    def __str__(self):
+        return f"User(id={self.id}, username='{self.name}', email='{self.email}')"
+    
+    def __repr__(self):
+        return self.__str__()
 ```
 
 ### 3. Gestion base de données (`database.py`)
 
 ```python
+# database.py - Gestionnaire de base de données corrigé
 import psycopg2
 import psycopg2.pool
 from psycopg2.extras import RealDictCursor
@@ -148,35 +156,48 @@ class DatabaseManager:
     
     def _init_pool(self):
         try:
+            logger.info(f"Initializing connection pool to: {self.config.DATABASE_URL.split('@')[1] if '@' in self.config.DATABASE_URL else 'localhost'}")
             self.pool = psycopg2.pool.SimpleConnectionPool(
                 1, 20, self.config.DATABASE_URL
             )
-            logger.info("Database connection pool initialized")
+            logger.info("Database connection pool initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize database pool: {e}")
             raise
     
     def get_connection(self):
+        if not self.pool:
+            raise Exception("Database pool not initialized")
         return self.pool.getconn()
     
     def return_connection(self, conn):
-        self.pool.putconn(conn)
+        if self.pool:
+            self.pool.putconn(conn)
     
     def init_tables(self):
+        """Initialiser les tables de la base de données"""
         conn = self.get_connection()
         try:
             with conn.cursor() as cursor:
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS users (
                         id SERIAL PRIMARY KEY,
-                        username VARCHAR(50) UNIQUE NOT NULL,
+                        name VARCHAR(50) UNIQUE NOT NULL,
                         email VARCHAR(100) UNIQUE NOT NULL,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 """)
+                
+                # Créer un index sur name et email pour les recherches
+                cursor.execute("""
+                    CREATE INDEX IF NOT EXISTS idx_users_username ON users(name);
+                """)
+                cursor.execute("""
+                    CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+                """)
+                
             conn.commit()
-            logger.info("Database tables initialized")
+            logger.info("Database tables and indexes initialized successfully")
         except Exception as e:
             conn.rollback()
             logger.error(f"Failed to initialize tables: {e}")
@@ -185,19 +206,34 @@ class DatabaseManager:
             self.return_connection(conn)
     
     def create_user(self, user: User) -> User:
+        """Créer un nouvel utilisateur"""
         conn = self.get_connection()
         try:
             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute("""
-                    INSERT INTO users (username, email)
+                    INSERT INTO users (name, email)
                     VALUES (%s, %s)
-                    RETURNING id, username, email, created_at, updated_at
-                """, (user.username, user.email))
+                    RETURNING id, name, email, 
+                             created_at AT TIME ZONE 'UTC' as created_at
+                """, (user.name, user.email))
                 
                 result = cursor.fetchone()
                 conn.commit()
                 
-                return User(**dict(result))
+                created_user = User(
+                    id=result['id'],
+                    name=result['name'],
+                    email=result['email'],
+                    created_at=result['created_at'].isoformat() if result['created_at'] else None
+                )
+                
+                logger.info(f"User created successfully: {created_user.name} (ID: {created_user.id})")
+                return created_user
+                
+        except psycopg2.IntegrityError as e:
+            conn.rollback()
+            logger.warning(f"User creation failed - integrity constraint: {e}")
+            raise Exception(f"name or email already exists: {e}")
         except Exception as e:
             conn.rollback()
             logger.error(f"Failed to create user: {e}")
@@ -206,12 +242,31 @@ class DatabaseManager:
             self.return_connection(conn)
     
     def get_users(self) -> List[User]:
+        """Récupérer tous les utilisateurs"""
         conn = self.get_connection()
         try:
             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-                cursor.execute("SELECT * FROM users ORDER BY created_at DESC")
+                cursor.execute("""
+                    SELECT id, name, email, 
+                           created_at AT TIME ZONE 'UTC' as created_at
+                    FROM users 
+                    ORDER BY created_at DESC
+                """)
                 results = cursor.fetchall()
-                return [User(**dict(row)) for row in results]
+                
+                users = []
+                for row in results:
+                    user = User(
+                        id=row['id'],
+                        name=row['name'],
+                        email=row['email'],
+                        created_at=row['created_at'].isoformat() if row['created_at'] else None
+                    )
+                    users.append(user)
+                
+                logger.info(f"Retrieved {len(users)} users from database")
+                return users
+                
         except Exception as e:
             logger.error(f"Failed to get users: {e}")
             raise
@@ -219,12 +274,28 @@ class DatabaseManager:
             self.return_connection(conn)
     
     def get_user_by_id(self, user_id: int) -> Optional[User]:
+        """Récupérer un utilisateur par son ID"""
         conn = self.get_connection()
         try:
             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-                cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+                cursor.execute("""
+                    SELECT id, name, email, 
+                           created_at AT TIME ZONE 'UTC' as created_at
+                    FROM users 
+                    WHERE id = %s
+                """, (user_id,))
                 result = cursor.fetchone()
-                return User(**dict(result)) if result else None
+                
+                if not result:
+                    return None
+                
+                return User(
+                    id=result['id'],
+                    name=result['name'],
+                    email=result['email'],
+                    created_at=result['created_at'].isoformat() if result['created_at'] else None
+                )
+                
         except Exception as e:
             logger.error(f"Failed to get user {user_id}: {e}")
             raise
@@ -232,20 +303,39 @@ class DatabaseManager:
             self.return_connection(conn)
     
     def update_user(self, user_id: int, user: User) -> Optional[User]:
+        """Mettre à jour un utilisateur"""
         conn = self.get_connection()
         try:
             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute("""
                     UPDATE users 
-                    SET username = %s, email = %s, updated_at = CURRENT_TIMESTAMP
+                    SET name = %s, email = %s
                     WHERE id = %s
-                    RETURNING id, username, email, created_at, updated_at
-                """, (user.username, user.email, user_id))
+                    RETURNING id, name, email, 
+                             created_at AT TIME ZONE 'UTC' as created_at
+                """, (user.name, user.email, user_id))
                 
                 result = cursor.fetchone()
+                
+                if not result:
+                    return None
+                
                 conn.commit()
                 
-                return User(**dict(result)) if result else None
+                updated_user = User(
+                    id=result['id'],
+                    name=result['name'],
+                    email=result['email'],
+                    created_at=result['created_at'].isoformat() if result['created_at'] else None
+                )
+                
+                logger.info(f"User updated successfully: {updated_user.name} (ID: {updated_user.id})")
+                return updated_user
+                
+        except psycopg2.IntegrityError as e:
+            conn.rollback()
+            logger.warning(f"User update failed - integrity constraint: {e}")
+            raise Exception(f"name or email already exists: {e}")
         except Exception as e:
             conn.rollback()
             logger.error(f"Failed to update user {user_id}: {e}")
@@ -254,13 +344,22 @@ class DatabaseManager:
             self.return_connection(conn)
     
     def delete_user(self, user_id: int) -> bool:
+        """Supprimer un utilisateur"""
         conn = self.get_connection()
         try:
             with conn.cursor() as cursor:
                 cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
                 deleted = cursor.rowcount > 0
-                conn.commit()
-                return deleted
+                
+            conn.commit()
+            
+            if deleted:
+                logger.info(f"User deleted successfully: ID {user_id}")
+            else:
+                logger.warning(f"No user found with ID {user_id} for deletion")
+                
+            return deleted
+            
         except Exception as e:
             conn.rollback()
             logger.error(f"Failed to delete user {user_id}: {e}")
@@ -269,35 +368,65 @@ class DatabaseManager:
             self.return_connection(conn)
     
     def health_check(self) -> bool:
+        """Vérifier la santé de la connexion à la base de données"""
         try:
             conn = self.get_connection()
             with conn.cursor() as cursor:
                 cursor.execute("SELECT 1")
-                cursor.fetchone()
+                result = cursor.fetchone()
             self.return_connection(conn)
-            return True
+            
+            is_healthy = result is not None
+            if is_healthy:
+                logger.debug("Database health check passed")
+            else:
+                logger.warning("Database health check failed")
+            return is_healthy
+            
         except Exception as e:
             logger.error(f"Database health check failed: {e}")
             return False
+    
+    def get_user_count(self) -> int:
+        """Obtenir le nombre total d'utilisateurs"""
+        conn = self.get_connection()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT COUNT(*) FROM users")
+                count = cursor.fetchone()[0]
+                logger.info(f"Total users in database: {count}")
+                return count
+        except Exception as e:
+            logger.error(f"Failed to get user count: {e}")
+            return 0
+        finally:
+            self.return_connection(conn)
+    
+    def close_all_connections(self):
+        """Fermer toutes les connexions du pool"""
+        if self.pool:
+            self.pool.closeall()
+            logger.info("All database connections closed")
 ```
 
 ### 4. Application principale (`app.py`)
 
 ```python
-# app.py - Version corrigée pour Flask 2.2+
+# app.py - Version utilisant database.py
 import os
 import sys
 import logging
 import signal
 from flask import Flask, jsonify, request
-from dataclasses import dataclass, asdict
-from typing import List, Optional
-import threading
+from config import Config
+from database import DatabaseManager
+from models import User
 
 # Configuration du logging
+config = Config()
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=getattr(logging, config.LOG_LEVEL.upper()),
+    format=config.LOG_FORMAT,
     handlers=[logging.StreamHandler(sys.stdout)]
 )
 
@@ -305,96 +434,22 @@ logger = logging.getLogger(__name__)
 
 # Initialisation de l'application
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-change-me')
-
-# Base de données simulée en mémoire (pour éviter PostgreSQL au début)
-users_storage = []
-next_id = 1
-db_lock = threading.Lock()
-
-@dataclass
-class User:
-    id: Optional[int] = None
-    username: str = ""
-    email: str = ""
-    
-    def to_dict(self):
-        return asdict(self)
-
-class DatabaseManager:
-    """Gestionnaire de base de données simulé en mémoire"""
-    
-    def __init__(self):
-        self.initialized = False
-    
-    def init_tables(self):
-        """Initialiser les tables (simulation)"""
-        if not self.initialized:
-            logger.info("Database tables initialized (memory storage)")
-            self.initialized = True
-    
-    def health_check(self) -> bool:
-        """Vérification de santé de la DB"""
-        return self.initialized
-    
-    def create_user(self, user: User) -> User:
-        """Créer un utilisateur"""
-        global next_id
-        with db_lock:
-            # Vérifier les doublons
-            for existing_user in users_storage:
-                if existing_user.username == user.username or existing_user.email == user.email:
-                    raise ValueError("User already exists")
-            
-            user.id = next_id
-            next_id += 1
-            users_storage.append(user)
-            return user
-    
-    def get_users(self) -> List[User]:
-        """Récupérer tous les utilisateurs"""
-        with db_lock:
-            return users_storage.copy()
-    
-    def get_user_by_id(self, user_id: int) -> Optional[User]:
-        """Récupérer un utilisateur par ID"""
-        with db_lock:
-            return next((u for u in users_storage if u.id == user_id), None)
-    
-    def update_user(self, user_id: int, user: User) -> Optional[User]:
-        """Mettre à jour un utilisateur"""
-        with db_lock:
-            existing_user = next((u for u in users_storage if u.id == user_id), None)
-            if not existing_user:
-                return None
-            
-            # Vérifier les doublons (sauf pour l'utilisateur actuel)
-            for u in users_storage:
-                if u.id != user_id and (u.username == user.username or u.email == user.email):
-                    raise ValueError("Username or email already exists")
-            
-            existing_user.username = user.username
-            existing_user.email = user.email
-            return existing_user
-    
-    def delete_user(self, user_id: int) -> bool:
-        """Supprimer un utilisateur"""
-        with db_lock:
-            user = next((u for u in users_storage if u.id == user_id), None)
-            if user:
-                users_storage.remove(user)
-                return True
-            return False
+app.config['SECRET_KEY'] = config.SECRET_KEY
 
 # Initialisation de la base de données
-db_manager = DatabaseManager()
+logger.info(f"Initializing database with URL: {config.DATABASE_URL}")
+db_manager = DatabaseManager(config)
 
 # Initialisation au démarrage de l'application
 def initialize_app():
     """Initialiser l'application au démarrage"""
     logger.info("Initializing application...")
-    db_manager.init_tables()
-    logger.info("Application initialized successfully")
+    try:
+        db_manager.init_tables()
+        logger.info("Application initialized successfully")
+    except Exception as e:
+        logger.error(f"Failed to initialize application: {e}")
+        raise
 
 # Gestion gracieuse de l'arrêt
 def signal_handler(signum, frame):
@@ -404,7 +459,6 @@ def signal_handler(signum, frame):
 signal.signal(signal.SIGTERM, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)
 
-# Routes de l'API
 @app.route('/health', methods=['GET'])
 def health():
     """Health check endpoint"""
@@ -416,7 +470,8 @@ def health():
         return jsonify({
             "status": status,
             "database": "connected" if db_healthy else "disconnected",
-            "version": "1.0.0"
+            "version": "1.0.0",
+            "database_url": config.DATABASE_URL.split('@')[1] if '@' in config.DATABASE_URL else config.DATABASE_URL
         }), status_code
     except Exception as e:
         logger.error(f"Health check failed: {e}")
@@ -429,7 +484,9 @@ def health():
 def get_users():
     """Récupérer tous les utilisateurs"""
     try:
+        logger.info("Getting all users from database")
         users = db_manager.get_users()
+        logger.info(f"Retrieved {len(users)} users from database")
         return jsonify({
             "users": [user.to_dict() for user in users],
             "count": len(users)
@@ -447,23 +504,25 @@ def create_user():
         if not data or not data.get('username') or not data.get('email'):
             return jsonify({"error": "Username and email are required"}), 400
         
+        logger.info(f"Creating user: {data['username']}")
         user = User(username=data['username'], email=data['email'])
         created_user = db_manager.create_user(user)
         
-        logger.info(f"Created user: {created_user.username}")
+        logger.info(f"Created user: {created_user.username} with ID: {created_user.id}")
         return jsonify(created_user.to_dict()), 201
         
-    except ValueError as e:
-        logger.warning(f"User creation failed: {e}")
-        return jsonify({"error": str(e)}), 409
     except Exception as e:
         logger.error(f"Failed to create user: {e}")
+        # Vérifier si c'est une erreur de contrainte d'unicité
+        if "duplicate key" in str(e).lower() or "unique constraint" in str(e).lower():
+            return jsonify({"error": "Username or email already exists"}), 409
         return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
     """Récupérer un utilisateur par ID"""
     try:
+        logger.info(f"Getting user with ID: {user_id}")
         user = db_manager.get_user_by_id(user_id)
         if not user:
             return jsonify({"error": "User not found"}), 404
@@ -482,6 +541,7 @@ def update_user(user_id):
         if not data or not data.get('username') or not data.get('email'):
             return jsonify({"error": "Username and email are required"}), 400
         
+        logger.info(f"Updating user with ID: {user_id}")
         user = User(username=data['username'], email=data['email'])
         updated_user = db_manager.update_user(user_id, user)
         
@@ -491,17 +551,18 @@ def update_user(user_id):
         logger.info(f"Updated user: {updated_user.username}")
         return jsonify(updated_user.to_dict())
         
-    except ValueError as e:
-        logger.warning(f"User update failed: {e}")
-        return jsonify({"error": str(e)}), 409
     except Exception as e:
         logger.error(f"Failed to update user {user_id}: {e}")
+        # Vérifier si c'est une erreur de contrainte d'unicité
+        if "duplicate key" in str(e).lower() or "unique constraint" in str(e).lower():
+            return jsonify({"error": "Username or email already exists"}), 409
         return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     """Supprimer un utilisateur"""
     try:
+        logger.info(f"Deleting user with ID: {user_id}")
         deleted = db_manager.delete_user(user_id)
         
         if not deleted:
@@ -514,6 +575,18 @@ def delete_user(user_id):
         logger.error(f"Failed to delete user {user_id}: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
+# Route de debug pour vérifier la configuration
+@app.route('/debug/info', methods=['GET'])
+def debug_info():
+    """Informations de debug sur l'application"""
+    return jsonify({
+        "database_url": config.DATABASE_URL.split('@')[1] if '@' in config.DATABASE_URL else "Not configured",
+        "log_level": config.LOG_LEVEL,
+        "port": config.PORT,
+        "host": config.HOST,
+        "flask_env": config.FLASK_ENV
+    })
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({"error": "Resource not found"}), 404
@@ -525,15 +598,16 @@ def internal_error(error):
 
 if __name__ == '__main__':
     # Initialiser l'application
-    initialize_app()
+    try:
+        initialize_app()
+        logger.info("Application startup completed")
+    except Exception as e:
+        logger.error(f"Failed to start application: {e}")
+        sys.exit(1)
     
-    # Configuration du serveur
-    port = int(os.environ.get('PORT', 8080))
-    host = os.environ.get('HOST', '0.0.0.0')
-    debug_mode = os.environ.get('FLASK_ENV') == 'development'
-    
-    logger.info(f"Starting server on {host}:{port}")
-    app.run(host=host, port=port, debug=debug_mode)
+    logger.info(f"Starting server on {config.HOST}:{config.PORT}")
+    logger.info(f"Database: {config.DATABASE_URL.split('@')[1] if '@' in config.DATABASE_URL else 'Not configured'}")
+    app.run(host=config.HOST, port=config.PORT, debug=(config.FLASK_ENV == 'development'))
 ```
 
 ### 5. Dockerfile multi-stage
@@ -705,18 +779,24 @@ pytest tests/ -v
 ## Points clés de l'implémentation
 
 ### Respect des 12 factors
-1. **Codebase** : Code source unique avec déploiements multiples
-2. **Dependencies** : `requirements.txt` avec versions fixes
-3. **Config** : Variables d'environnement pour toute la configuration
-4. **Backing services** : PostgreSQL via URL de connexion configurable
-5. **Build/Release/Run** : Docker multi-stage, séparation claire
-6. **Processes** : API stateless, pas de stockage local
-7. **Port binding** : Service exporté via port configurable
-8. **Concurrency** : Scalabilité horizontale via Docker
-9. **Disposability** : Gestion gracieuse des signaux
-10. **Dev/prod parity** : Même stack Docker partout
-11. **Logs** : Logs structurés vers stdout
-12. **Admin processes** : Scripts séparés pour l'administration
+* Pour chacun des 12 facteurs identifiez ce qui est fait dans le projet pour répondre au besoin
+
+<details>
+    <summary>Solution proposée</summary>
+    1. **Codebase** : Code source unique avec déploiements multiples
+    2. **Dependencies** : `requirements.txt` avec versions fixes
+    3. **Config** : Variables d'environnement pour toute la configuration
+    4. **Backing services** : PostgreSQL via URL de connexion configurable
+    5. **Build/Release/Run** : Docker multi-stage, séparation claire
+    6. **Processes** : API stateless, pas de stockage local
+    7. **Port binding** : Service exporté via port configurable
+    8. **Concurrency** : Scalabilité horizontale via Docker
+    9. **Disposability** : Gestion gracieuse des signaux
+    10. **Dev/prod parity** : Même stack Docker partout
+    11. **Logs** : Logs structurés vers stdout
+    12. **Admin processes** : Scripts séparés pour l'administration
+</details>
+
 
 ### Fonctionnalités avancées
 - **Health checks** : Endpoint `/health` avec vérification DB
