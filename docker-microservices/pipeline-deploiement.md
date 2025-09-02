@@ -6,13 +6,53 @@
 
 ## Consignes
 
-1. Créez un repository Git avec l'application
-2. Configurez GitHub Actions pour :
+1. Créez un repository Git avec l'application de l'exercice précédent
+2. Configurez Gitlab CI pour :
    - Exécuter les tests
    - Builder l'image Docker
    - Pusher vers un registry
-3. Déployez avec Docker Compose
-4. Créez les manifestes Kubernetes
+3. Lancer l'application avec Docker Compose sur votre poste en utilisant l'image poussez sur la registry
+
+** Template Gitlab CI **
+
+``ỳaml
+services:
+- docker:dind
+
+stages:
+- test
+- build
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+before_script:
+  - python --version
+  - pip install --upgrade pip
+  - pip install -r requirements.txt
+test:
+  stage: test
+  script:
+    - pytest --junitxml=report.xml
+  artifacts:
+    reports:
+      junit: report.xml
+    paths:
+      - .pytest_cache/
+    expire_in: 1 week
+
+build:
+    stage: build
+    before_script:
+        - apk add --no-cache py3-pip
+        - pip install lastversion
+        - docker login -u ${DEPLOY_USER} -p ${DEPLOY_TOKEN} registry.gitlab.com
+    script:
+        - LASTVERSION=`lastversion ansible-community/ansible-lint`
+        - docker build --build-arg VERSION=${LASTVERSION} -t registry.gitlab.com/dockerfiles6/ansible-lint:${LASTVERSION} -t registry.gitlab.com/dockerfiles6/ansible-lint:latest .
+        - docker push registry.gitlab.com/dockerfiles6/ansible-lint:${LASTVERSION}
+        - docker push registry.gitlab.com/dockerfiles6/ansible-lint:latest
+```
 
 **Template GitHub Actions** :
 ```yaml
