@@ -212,6 +212,7 @@ services:
     restart: unless-stopped
     # Retirer les ports pour utiliser Traefik
     ports: []
+    
     environment:
       - DEBUG=false
       - LOG_LEVEL=warn
