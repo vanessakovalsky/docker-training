@@ -369,8 +369,11 @@ docker-compose exec app env | grep -E "(JWT|API|PASSWORD)"
 
 ## Nettoyage
 ```bash
-# Arrêter et nettoyer
+# Arrêter et nettoyer l'environnement de dev
 docker-compose down -v
+# Arrêter l'environnement de prod :
+docker-compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml down
+
 cd ..
 rm -rf secrets-exercise
 ```
