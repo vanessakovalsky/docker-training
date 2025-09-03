@@ -30,9 +30,8 @@ build:
     - pip install lastversion
     - echo "${CI_JOB_TOKEN}" | docker login registry.gitlab.com --username gitlab-ci-token --password-stdin
   script:
-    - LASTVERSION=$(lastversion ansible-community/ansible-lint)
-    - docker build -t registry.gitlab.com/vanessakovalibre/12-factors-app-python:latest .
-    - docker push registry.gitlab.com/vanessakovalibre/12-factors-app-python:latest
+    - docker build -t registry.gitlab.com/vanessakovalibre/12-factors-app-python:${CI_JOB_ID} .
+    - docker push registry.gitlab.com/vanessakovalibre/12-factors-app-python:${CI_JOB_ID}
 
 ```
 
