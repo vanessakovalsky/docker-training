@@ -30,8 +30,8 @@ build:
     - pip install lastversion
     - echo "${CI_JOB_TOKEN}" | docker login registry.gitlab.com --username gitlab-ci-token --password-stdin
   script:
-    - docker build -t registry.gitlab.com/vanessakovalibre/12-factors-app-python:${CI_JOB_ID} .
-    - docker push registry.gitlab.com/vanessakovalibre/12-factors-app-python:${CI_JOB_ID}
+    - docker build -t registry.gitlab.com/${CI_PROJECT_PATH}:${CI_JOB_ID} .
+    - docker push registry.gitlab.com/${CI_PROJECT_PATH}:${CI_JOB_ID}
 
 ```
 
