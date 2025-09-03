@@ -329,7 +329,7 @@ docker compose ps
 docker compose logs app
 
 # Accéder à l'app : http://localhost:3000
-# Accéder à pgAdmin : http://localhost:8080
+# Accéder à pgAdmin : http://localhost:8080 (attendre que les logs indique que l'application à démarer)
 ```
 
 ### Tester la configuration production
