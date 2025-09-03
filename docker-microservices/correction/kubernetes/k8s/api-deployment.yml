@@ -25,6 +25,11 @@ spec:
           value: "staging"
         - name: DEBUG
           value: "False"
+        - name: DBPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: password
         livenessProbe:
           httpGet:
             path: /health
