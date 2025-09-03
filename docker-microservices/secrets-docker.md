@@ -320,13 +320,13 @@ esac
 ### Tester l'environnement de développement
 ```bash
 # Démarrer en dev (utilise automatiquement .env et docker-compose.override.yml)
-docker-compose up -d
+docker compose up -d
 
 # Vérifier les services
-docker-compose ps
+docker compose ps
 
 # Voir les logs
-docker-compose logs app
+docker compose logs app
 
 # Accéder à l'app : http://localhost:3000
 # Accéder à pgAdmin : http://localhost:8080
@@ -359,8 +359,8 @@ docker-compose exec app env | grep -E "(JWT|API|PASSWORD)"
 3. Comment gérer les secrets en production de manière encore plus sécurisée ?
 4. Que se passe-t-il si on oublie de créer le fichier .env ?
 
-## Bonus (si temps restant)
-- Utiliser Docker Secrets au lieu des variables d'environnement
+## Bonus (pour approfondir le sujet plus tard)
+- Utiliser Docker Secrets au lieu des variables d'environnement (nécessite docker swarm ou Kubernetes)
 - Intégrer avec un gestionnaire de secrets externe (HashiCorp Vault, AWS Secrets Manager)
 - Créer un script de rotation des secrets
 
