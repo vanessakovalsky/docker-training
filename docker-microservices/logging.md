@@ -15,10 +15,12 @@ elk-quick/
 ├── logstash/
 │   └── pipeline.conf
 ├── services/
-│   ├── api.py
-│   └── web.js
-└── kibana/
-    └── dashboard.json
+│   ├── api
+│       └── api.py
+│       └── Dockerfile
+│   ├── web
+│       └── web.js
+│       └── Dockerfile
 ```
 
 ### Docker Compose ELK + Services
@@ -61,13 +63,7 @@ services:
   # Services métier
   api-service:
     build:
-      context: .
-      dockerfile_inline: |
-        FROM python:3.9-slim
-        WORKDIR /app
-        RUN pip install flask requests
-        COPY services/api.py .
-        CMD ["python", "api.py"]
+      context: services/api
     ports:
       - "5001:5000"
     depends_on:
@@ -75,13 +71,7 @@ services:
 
   web-service:
     build:
-      context: .
-      dockerfile_inline: |
-        FROM node:16-alpine
-        WORKDIR /app
-        RUN npm init -y && npm install express winston winston-logstash
-        COPY services/web.js .
-        CMD ["node", "web.js"]
+      context: services/web
     ports:
       - "3000:3000"
     depends_on:
