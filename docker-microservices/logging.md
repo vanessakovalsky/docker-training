@@ -220,6 +220,14 @@ if __name__ == '__main__':
     logger.info("API Service starting up")
     app.run(host='0.0.0.0', port=5000)
 ```
+* Créer le fichier Dockerfile
+```
+FROM python:3.9-slim
+WORKDIR /app
+RUN pip install flask requests
+COPY services/api.py .
+CMD ["python", "api.py"]
+```
 
 ### Web Service Node.js avec Winston
 Créez `services/web.js` :
@@ -314,7 +322,14 @@ app.listen(port, '0.0.0.0', () => {
   console.log(`Web service running on port ${port}`);
 });
 ```
-
+* Créer le fichier Dockerfile
+```
+FROM node:16-alpine
+WORKDIR /app
+RUN npm init -y && npm install express winston winston-logstash
+COPY services/web.js .
+CMD ["node", "web.js"]
+```
 ---
 
 ## Phase 3 : Déploiement et Tests (5 min)
