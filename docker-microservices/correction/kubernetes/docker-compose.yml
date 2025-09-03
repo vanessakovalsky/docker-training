@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./api
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=True
+    ports:
+      - "5000:5000"
+    depends_on:
+      - database
+
+  web:
+    build: ./web
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+  database:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=app
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8088:80"
+    depends_on:
+      - web
+      - api
+
+volumes:
+  postgres_data:

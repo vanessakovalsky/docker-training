@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  api:
+    environment:
+      - ENVIRONMENT=dev
+      - DEBUG=TRUE
+      - DATABASE_URL=postgresql://user:password@database:5432/app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  web:
+    restart: unless-stopped
+
+  database:
+    environment:
+      - POSTGRES_DB=app_staging
+      - POSTGRES_USER=staging_user
+      - POSTGRES_PASSWORD=staging_secure_password
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U staging_user -d app_staging"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  nginx:
+    restart: unless-stopped

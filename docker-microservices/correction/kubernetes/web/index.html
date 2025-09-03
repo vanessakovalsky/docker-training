@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Microservices App</title>
+</head>
+<body>
+    <h1>Application Microservices</h1>
+    <div id="users"></div>
+    <script>
+        fetch('/api/users')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('users').innerHTML = 
+                    '<h2>Utilisateurs (' + data.environment + ')</h2>' +
+                    data.users.map(u => '<p>' + u.name + '</p>').join('');
+            });
+    </script>
+</body>
+</html>
