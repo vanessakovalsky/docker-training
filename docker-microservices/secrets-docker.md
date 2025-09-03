@@ -210,6 +210,8 @@ version: '3.8'
 services:
   app:
     restart: unless-stopped
+    # Retirer les ports pour utiliser Traefik
+    ports: []
     environment:
       - DEBUG=false
       - LOG_LEVEL=warn
@@ -232,12 +234,12 @@ services:
 
   # Retirer pgadmin en production
   pgadmin:
+    image: dpage/pgadmin4:latest
     deploy:
       replicas: 0
 
 volumes:
   postgres_prod_data:
-    external: true
 ```
 
 ### 4.2 Créer .env.prod.example
