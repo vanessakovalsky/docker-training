@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  service-c:
+    build: ./service-c
+    container_name: database-service
+    ports:
+      - "5000:5000"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  service-b:
+    build: ./service-b
+    container_name: api-gateway
+    ports:
+      - "5001:5001"
+    depends_on:
+      - service-c
+    networks:
+      - microservices-net
+    restart: unless-stopped
+    environment:
+      - SERVICE_C_URL=http://service-c:5000
+
+  service-a:
+    build: ./service-a
+    container_name: frontend
+    ports:
+      - "5002:5002"
+    depends_on:
+      - service-b
+    networks:
+      - microservices-net
+    restart: unless-stopped
+    environment:
+      - SERVICE_B_URL=http://service-b:5001
+
+networks:
+  microservices-net:
+    driver: bridge
+
+volumes:
+  app-data:

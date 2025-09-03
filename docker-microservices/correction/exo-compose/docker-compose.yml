@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  web:
+    build: ./api
+    ports:
+      - "3000:3000"
+    environment:
+      - REDIS_HOST=redis
+      - DB_HOST=postgres
+      - DB_NAME=myapp
+      - DB_USER=user
+      - DB_PASSWORD=password
+    depends_on:
+      - redis
+      - postgres
+
+  web2:
+    build: ./web2/
+    
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=myapp
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  postgres_data:
