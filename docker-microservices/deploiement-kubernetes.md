@@ -28,6 +28,7 @@ microservices-app/
 │   └── index.html
 ├── docker-compose.yml
 ├── docker-compose.override.yml
+├── nginx.conf
 └── k8s/
     ├── api-deployment.yaml
     ├── web-deployment.yaml
@@ -194,8 +195,6 @@ services:
 
   nginx:
     restart: unless-stopped
-    volumes:
-      - ./nginx-staging.conf:/etc/nginx/nginx.conf
 ```
 
 ### Configuration Nginx
